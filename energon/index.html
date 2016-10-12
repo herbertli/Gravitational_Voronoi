@@ -1,0 +1,129 @@
+<html>
+	<header>
+		<title>Gravitational Voronoi</title>
+	</header>
+		<style>
+			body {
+			    background-color: FloralWhite;
+			}
+
+			h1 {
+			    color: brown;
+			    text-align: center;
+			    font-family: "Comic Sans MS", cursive, sans-serif;
+			}
+
+			p {
+			    font-family: verdana;
+			    font-size: 20px;
+			}
+
+			#canvas {
+			    border:8px solid #c3c3c3;
+			    padding-left: 0;
+			    padding-right: 0;
+			    margin-left: auto;
+			    margin-right: auto;
+			    display: block;
+			    width: 800px;
+			}
+		</style>
+		<body>
+			<H1>
+				Gravitational Vononoi
+			</H1>
+		
+			<canvas id="canvas" width="1000" height="1000">
+                      Your browser does not support the HTML5 canvas tag.
+            </canvas>
+
+            <script src="/socket.io/socket.io.js"></script>
+            <script type="text/javascript">
+
+            var socket = io("127.0.0.1:10000"); 
+
+            var canvas = document.getElementById('canvas');
+			var canvasWidth = canvas.width;
+			var canvasHeight = canvas.height;
+			var boardSize = canvasWidth;
+			var ctx = canvas.getContext('2d');
+
+			moves = [[], []]
+
+			function drawStones(boardData)
+			{
+				var board = boardData.split(" ");
+				var j = parseInt(board[board.length - 1]);
+				var i = parseInt(board[board.length - 2]);
+				var currentTurn = parseInt(board[board.length - 3]);
+
+				moves[currentTurn - 1].push([j, i]);
+
+				for(var b = 0 ; b < moves.length ; b++)
+				{
+					for(var a = 0 ; a < moves[b].length ; a++)
+					{
+			   			var centerX = moves[b][a][0];
+					    var centerY = moves[b][a][1];
+					    var radius = 10;
+
+					    ctx.beginPath();
+					    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+					    var color = '';
+					    if(b == 0)
+					    	color = 'red';
+					    else if(b == 1)
+					    	color = 'blue';
+					    ctx.fillStyle = color;
+					    ctx.fill();
+					    ctx.lineWidth = 3;
+					    ctx.strokeStyle = '#003300';
+					    ctx.stroke();
+					}
+				}
+			}
+
+			function drawBoard(boardData) 
+			{
+				var board = boardData.split(" ");
+				var j = parseInt(board[board.length - 1]);
+				var i = parseInt(board[board.length - 2]);
+
+			    var imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+			    var data = imageData.data;
+
+			    for (var y = 0; y < 1000; y++)
+			    {
+			        for (var x = 0; x < 1000; x++) 
+			        {
+			            var index = (y * 1000 + x) * 4;
+
+			            if(parseInt(board[index/4]) == 1)
+			            {
+			            	data[index]   = 225;
+			            	data[++index] = 0;
+			            	data[++index] = 0;
+			            	data[++index] = 125;
+				        }   
+				        else if(parseInt(board[index/4]) == 2)
+				        {
+				        	data[index]   = 0;
+				            data[++index] = 0;
+				            data[++index] = 225;
+				            data[++index] = 125;	
+			      		}
+			        }
+			    }
+
+			    ctx.putImageData(imageData, 0, 0);
+			}  
+
+			socket.on('to_client', function(data) 
+			{
+			    drawBoard(data);
+			    drawStones(data);
+			});
+
+            </script>
+		</body>
+</html>

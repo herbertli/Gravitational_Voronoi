@@ -57,3 +57,15 @@ You will need to have node installed on your machine. The socket.io package is a
 
 ## Running with Display on Energon
 
+To do this successfully, you need to do two important things:
+
+* Obtain the local IP address of your system. You do this by running the provided `getLocalIp.py` script. If this yields `127.0.0.1`, then you need to find the IP using any alternative method.
+
+* Place your game server and client code on energon2.
+
+* Change the following lines in the files as detailed below:
+
+	Voronoi_Game.py: line 181:
+		- sock.sendto(message.encode('utf-8'), ('', 8080))
+		+ sock.sentto(message.encode('utf-8'), (<local IP of your machine>, 8080))
+

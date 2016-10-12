@@ -59,7 +59,7 @@ for(var i = 0 ; i < 1000 ; i++)
   scoreGrid.push(inner);
 }
 
-server.bind(8080, '');
+server.bind(8080, socket.gethostbyname(socket.getfqdn()));
 
 server.on('error', function(err){
   console.log('server error:\n${err.stack}');

@@ -71,3 +71,5 @@ To do this successfully, you need to do two important things:
 	- sock.sendto(message.encode('utf-8'), ('', 8080))
 	+ sock.sentto(message.encode('utf-8'), (<local IP of your machine>, 8080))
 ```
+
+You will run the game server and clients on energon2, and you will run `web.js` and the webpage `localhost:10000` on your machine. 

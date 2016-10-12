@@ -66,6 +66,8 @@ To do this successfully, you need to do two important things:
 * Change the following lines in the files as detailed below:
 
 	Voronoi_Game.py: line 181:
-		- sock.sendto(message.encode('utf-8'), ('', 8080))
-		+ sock.sentto(message.encode('utf-8'), (<local IP of your machine>, 8080))
 
+```
+	- sock.sendto(message.encode('utf-8'), ('', 8080))
+	+ sock.sentto(message.encode('utf-8'), (<local IP of your machine>, 8080))
+```

@@ -12,13 +12,19 @@ def declareWinner(scores):
 	maxScore = scores[0]
 	winner = [1]
 
-	print "Player {} score: {}".format(1, scores[0])
-
-	if maxScore < 0:
+	if maxScore == -1:
 		print "Illegal move by Player 1"
 
+	if maxScore == -2:
+		print "Player 1 timed out"
+
+	print "Player {} score: {}".format(1, scores[0])
+
 	for i in range(1, len(scores)):
-		if scores[i] < 0:
+		if scores[i] == -1:
+			print "Illegal move by Player {}".format(i + 1)
+
+		if scores[i] == -2:
 			print "Illegal move by Player {}".format(i + 1)
 
 		print "Player {} score: {}".format(i + 1, scores[i])
@@ -124,6 +130,15 @@ while (1):
 		scores[currentTurn] = -1
 		gameEnded = 1
 
+	# If i and j are outside the grid
+	if i < 0 or i > 999:
+		scores[currentTurn] = -1
+		gameEnded = 1
+
+	if j < 0 or j > 999:
+		scores[currentTurn] = -1
+		gameEnded = 1
+
 	# If there are other stones within a euclidean distance of 66
 	for iCoordinate in range(max(0, i - 66), min(1000, i + 66)):
 		for jCoordinate in range(max(0, j - 66), min(1000, i + 66)):
@@ -168,6 +183,10 @@ while (1):
 	# -------------------------------------------------------------------------
 	# Assess winning/losing conditions
 	# -------------------------------------------------------------------------
+
+	if timeForPlayers[currentTurn] < 0:
+		scores[currentTurn] = -2
+		gameEnded = 1
 
 	movesMade = movesMade + 1
 	if movesMade == N * 2:

@@ -72,4 +72,13 @@ To do this successfully, you need to do two important things:
 	+ sock.sentto(message.encode('utf-8'), (<local IP of your machine>, 8080))
 ```
 
-You will run the game server and clients on energon2, and you will run `web.js` and the webpage `localhost:10000` on your machine. 
+You will run the game server and clients on energon2, and you will run `web.js` and the webpage `localhost:10000` on your machine.
+
+## Submission
+
+Please send us your client as well as a bash file that executes it. Also make sure to let us know if you require us to load a module for python. Email your clients to both of the following recipients:
+
+	ad3531@nyu.edu - Anurag Dhaipule
+	hmz224@nyu.edu - Hassan Mujtaba Zaidi
+
+	Team Zorro

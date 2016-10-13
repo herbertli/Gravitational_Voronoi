@@ -64,6 +64,7 @@ For each run, please do restart the web server and then refresh the html webpage
 * Refresh the html webpage i.e. `localhost:10000`
 * Revert back to the prompt by `Voronoi_Game.py` and press the 'Enter' key
 * Watch game progress on display/console
+* Breathe a sigh of relief
 
 ## Running with Display on Energon
 

@@ -55,6 +55,16 @@ You will need to have node installed on your machine. The socket.io package is a
 
 * Now go back to your server code and press the 'Enter' key. The game should start and you should see the grid color appropriately after each successive move.
 
+**NOTE** 
+For each run, please do restart the web server and then refresh the html webpage before running the game. Otherwise, the display from previous runs corrupts the results for the new run. So the workflow is:
+
+* Start `Voronoi_Game.py`
+* Start both clients (`Voronoi_Client.py`)
+* Start the web server `web.js` (CTRL-C the previous one if applicable)
+* Refresh the html webpage i.e. `localhost:10000`
+* Revert back to the prompt by `Voronoi_Game.py` and press the 'Enter' key
+* Watch game progress on display/console
+
 ## Running with Display on Energon
 
 To do this successfully, you need to do two important things:

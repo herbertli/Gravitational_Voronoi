@@ -70,6 +70,8 @@ currentTurn = 0
 movesMade = 0
 gameEnded = 0
 
+moves = []
+
 print "\nStarting\n"
 
 while (1):
@@ -84,17 +86,9 @@ while (1):
 	# S[1]  		 --> The number of moves that have been played so far
 	# S[2, 3, 4 ...] --> i-coordinate, j-coordinate, and player
 
-	moves = []
-
-	for i in range(0, 1000):
-		for j in range(0, 1000):
-			if grid[i][j] != 0:
-				moves.append(i)
-				moves.append(j)
-				moves.append(grid[i][j])
-
-	moves = [gameEnded] + [len(moves)/3] + moves
+	
 	gameInfo = " ".join(str(x) for x in moves)
+	gameInfo = str(gameEnded) + " " + str(len(moves)/3) + " " + gameInfo
 
 	if gameEnded == 1:
 		for player in players:
@@ -153,6 +147,10 @@ while (1):
 
 	grid[i][j] = currentTurn + 1
 	stonesPlayed[currentTurn].append(i * N + j)
+
+	moves.append(i)
+	moves.append(j)
+	moves.append(currentTurn + 1)
 
 	# -------------------------------------------------------------------------
 	# Calculate and update score for each player

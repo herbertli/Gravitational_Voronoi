@@ -148,6 +148,9 @@ while (1):
 					scores[currentTurn] = -1
 					gameEnded = 1
 
+	if gameEnded == 1:
+		break
+
 	grid[i][j] = currentTurn + 1
 	stonesPlayed[currentTurn].append(i * N + j)
 

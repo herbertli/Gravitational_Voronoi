@@ -30,7 +30,7 @@
 		</style>
 		<body>
 			<H1>
-				Gravitational Vononoi
+				Gravitational Voronoi
 			</H1>
 		
 			<canvas id="canvas" width="1000" height="1000">
@@ -48,7 +48,14 @@
 			var boardSize = canvasWidth;
 			var ctx = canvas.getContext('2d');
 
-			moves = [[], []]
+			var colors = ['red', 'blue', 'green', 'orange', 'yellow', 'purple',
+						  'silver', 'olive', 'teal'];
+
+			var colorRGB = [[255,0,0], [0,0,255], [0,255,0], [255,165,0],
+							[255,255,0], [128,0,128], [192,192,192], 
+							[128,128,0], [0,128,128]]
+
+			moves = []
 
 			function drawStones(boardData)
 			{
@@ -69,11 +76,9 @@
 
 					    ctx.beginPath();
 					    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-					    var color = '';
-					    if(b == 0)
-					    	color = 'red';
-					    else if(b == 1)
-					    	color = 'blue';
+					
+					    var color = colors[b];
+
 					    ctx.fillStyle = color;
 					    ctx.fill();
 					    ctx.lineWidth = 3;
@@ -88,9 +93,19 @@
 				var board = boardData.split(" ");
 				var j = parseInt(board[board.length - 1]);
 				var i = parseInt(board[board.length - 2]);
+				var numberOfPlayers = parseInt([board[board.length - 4]]);
+
+				if (moves.length == 0)
+				{
+					for(var i = 0 ; i < numberOfPlayers ; i++)
+					{
+						moves.push([]);
+					}
+				}
 
 			    var imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
 			    var data = imageData.data;
+
 
 			    for (var y = 0; y < 1000; y++)
 			    {
@@ -98,20 +113,17 @@
 			        {
 			            var index = (y * 1000 + x) * 4;
 
-			            if(parseInt(board[index/4]) == 1)
+			            player = parseInt(board[index/4]);
+
+			            if(player > 0)
 			            {
-			            	data[index]   = 225;
-			            	data[++index] = 0;
-			            	data[++index] = 0;
+				            var gridColor = colorRGB[player - 1];
+
+							data[index]   = gridColor[0];
+							data[++index] = gridColor[1];
+			            	data[++index] = gridColor[2];
 			            	data[++index] = 125;
-				        }   
-				        else if(parseInt(board[index/4]) == 2)
-				        {
-				        	data[index]   = 0;
-				            data[++index] = 0;
-				            data[++index] = 225;
-				            data[++index] = 125;	
-			      		}
+			            }
 			        }
 			    }
 

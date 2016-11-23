@@ -5,20 +5,20 @@ class Voronoi_Server:
         self.host = host
         self.port = port
         self.mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.mySocket.setsockopt(socket.SOL_SOCKET, 
+                socket.SO_REUSEADDR, 1)
         self.mySocket.bind((self.host, self.port))
         self.connection = [None] * numberOfPlayers
         self.address = [None] * numberOfPlayers
 
-    def establishConnection(self):
+    def establishConnection(self, numberOfPlayers):
         self.mySocket.listen(2)
 
-        print "Waiting for player 1."
-        self.connection[0], self.address[0] = self.mySocket.accept()
-        print "Connection from Player 1 established."
-
-        print "Waiting for player 2."
-        self.connection[1], self.address[1] = self.mySocket.accept()
-        print "Connection from Player 2 established."
+        for i in range(1, numberOfPlayers + 1):
+            print "Waiting for player " + str(i)
+            self.connection[i - 1], self.address[i - 1] = \
+                    self.mySocket.accept()
+            print "Connection from Player " + str(i) + " established."
 
         raw_input("Press Enter to continue...")
 

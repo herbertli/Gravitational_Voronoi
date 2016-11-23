@@ -4,11 +4,11 @@ net = require('net');
 
 var webserver = http.createServer(function (request, response)
 {
-	fs.readFile('index.html', 'utf-8', function (error, data)
-	{
-		response.writeHead(200, {'Content-Type': 'text/html'})
-		response.end(data);
-	});
+  fs.readFile('index.html', 'utf-8', function (error, data)
+  {
+    response.writeHead(200, {'Content-Type': 'text/html'})
+    response.end(data);
+  });
 }).listen(10000);
 
 var io = require('socket.io')(webserver);
@@ -26,10 +26,11 @@ function euclideanDistance(x1, y1, x2, y2)
   return distance;
 }
 
-var numberOfPlayers = 2;
+var numberOfPlayers = parseInt(process.argv[2]);
+console.log(numberOfPlayers);
 
 // Setting up the pull on each pixel by each of the player's stones
-var pull = [];
+var pull  = [];
 var outer = [];
 var inner = [];
 for(var i = 0 ; i < numberOfPlayers ; i++)
@@ -59,7 +60,7 @@ for(var i = 0 ; i < 1000 ; i++)
   scoreGrid.push(inner);
 }
 
-server.bind(8080, socket.gethostbyname(socket.getfqdn()));
+server.bind(8080, '');
 
 server.on('error', function(err){
   console.log('server error:\n${err.stack}');
@@ -86,7 +87,7 @@ server.on('message', function(msg, rinfo){
       }
 
       var Di = euclideanDistance(x, y, i, j);
-      pull[currentTurn][x][y] += (1 / Di);
+      pull[currentTurn][x][y] += (1 / (Di * Di));
       
       
       var oldPlayer = scoreGrid[x][y];
@@ -114,6 +115,7 @@ server.on('message', function(msg, rinfo){
   }
 
   var player = currentTurn + 1;
+  board = board + numberOfPlayers.toString() + " ";
   board = board + (player).toString() + " ";
   board = board + i.toString() + " ";
   board = board + j.toString();

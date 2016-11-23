@@ -26,10 +26,11 @@ function euclideanDistance(x1, y1, x2, y2)
   return distance;
 }
 
-var numberOfPlayers = 2;
+var numberOfPlayers = parseInt(process.argv[2]);
+console.log(numberOfPlayers);
 
 // Setting up the pull on each pixel by each of the player's stones
-var pull = [];
+var pull  = [];
 var outer = [];
 var inner = [];
 for(var i = 0 ; i < numberOfPlayers ; i++)
@@ -86,7 +87,7 @@ server.on('message', function(msg, rinfo){
       }
 
       var Di = euclideanDistance(x, y, i, j);
-      pull[currentTurn][x][y] += (1 / Di);
+      pull[currentTurn][x][y] += (1 / (Di * Di));
       
       
       var oldPlayer = scoreGrid[x][y];
@@ -114,6 +115,7 @@ server.on('message', function(msg, rinfo){
   }
 
   var player = currentTurn + 1;
+  board = board + numberOfPlayers.toString() + " ";
   board = board + (player).toString() + " ";
   board = board + i.toString() + " ";
   board = board + j.toString();

@@ -8,22 +8,22 @@ The files relevant to this mode are available in the `local` directory and they 
 
 
 ```
-	python Voronoi_Game.py <Number of Stones>
+	python Voronoi_Game.py <Number of Stones> <Number of Players> <PORT Number>
 ```
 
 And the random client by:
 
 ```
-	python Voronoi_Client.py <Number of Stones>
+	python Voronoi_Client.py <Number of Stones> <Number of Players> <PORT Number>
 ```
 
-If you want to test on energon, you may need to use:
+The ports for the game and the client need to be the same. If you want to test on energon, you may need to use:
 
 ```
 	module load python-2.7
 ```
 
-The game server will wait for two clients to connect before prompting the user to 'Press Enter'. Once the user complies, the game will commence. At the end, the server will echo the final scores of both players and announce the winner or tied winners in the exceptional case. 
+The game server will wait for two clients to connect before prompting the user to 'Press Enter'. Once the user complies, the game will commence. At the end, the server will echo the final scores of all players and announce the winner or tied winners in the exceptional case. 
 
 The client `Voronoi_Client.py` implements a random algorithm to input the moves to the server. The input format is:
 
@@ -46,7 +46,7 @@ You run the `local` files as mentioned before but to run the display you perform
 * Once you have started the game server and both clients have connected, before pressing the 'Enter' key, run:
 
 ```
-	node web.js
+	node web.js <Number of Players>
 ```
 
 You will need to have node installed on your machine. The socket.io package is already present in the directory. 
@@ -59,7 +59,7 @@ You will need to have node installed on your machine. The socket.io package is a
 For each run, please do restart the web server and then refresh the html webpage before running the game. Otherwise, the display from previous runs corrupts the results for the new run. So the workflow is:
 
 * Start `Voronoi_Game.py`
-* Start both clients (`Voronoi_Client.py`)
+* Start all clients (`Voronoi_Client.py`)
 * Start the web server `web.js` (CTRL-C the previous one if applicable)
 * Refresh the html webpage i.e. `localhost:10000`
 * Revert back to the prompt by `Voronoi_Game.py` and press the 'Enter' key

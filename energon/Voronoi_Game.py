@@ -45,13 +45,14 @@ def declareWinner(scores):
 # -----------------------------------------------------------------------------
 
 # Setting up game environment
-numberOfPlayers = 2;
+numberOfPlayers = int(sys.argv[2]);
 grid = [[0] * 1000 for item in range(0, 1000)]
 scoreGrid = [[0] * 1000 for item in range(0, 1000)]
 N = int(sys.argv[1])
 
-server = Voronoi_Server.Voronoi_Server('', 9000, numberOfPlayers)
-server.establishConnection()
+PORT = int(sys.argv[3])
+server = Voronoi_Server.Voronoi_Server('', PORT, numberOfPlayers)
+server.establishConnection(numberOfPlayers)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -137,8 +138,8 @@ while (1):
 		break
 
 	# If there are other stones within a euclidean distance of 66
-	for iCoordinate in range(max(0, i - 66), min(1000, i + 66)):
-		for jCoordinate in range(max(0, j - 66), min(1000, i + 66)):
+	for iCoordinate in range(max(0, i - 66), min(999, i + 66)):
+		for jCoordinate in range(max(0, j - 66), min(999, j + 66)):
 			if grid[iCoordinate][jCoordinate] != 0:
 				distance = (iCoordinate - i) * (iCoordinate - i) + \
 						   (jCoordinate - j) * (jCoordinate - j)
@@ -193,7 +194,7 @@ while (1):
 		gameEnded = 1
 
 	movesMade = movesMade + 1
-	if movesMade == N * 2:
+	if movesMade == N * numberOfPlayers:
 		gameEnded = 1
 
 	currentTurn = currentTurn + 1

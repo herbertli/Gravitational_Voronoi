@@ -44,18 +44,21 @@ def declareWinner(scores):
 
 # -----------------------------------------------------------------------------
 
+
 # Setting up game environment
 numberOfPlayers = int(sys.argv[2]);
 grid = [[0] * 1000 for item in range(0, 1000)]
 scoreGrid = [[0] * 1000 for item in range(0, 1000)]
 N = int(sys.argv[1])
 
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.sendto('reset'.encode('utf-8'), ('', 8080))
+
 PORT = int(sys.argv[3])
 server = Voronoi_Server.Voronoi_Server('', PORT, numberOfPlayers)
 server.establishConnection(numberOfPlayers)
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.sendto('reset'.encode('utf-8'), ('', 8080))
 
 players = [i for i in range(1, numberOfPlayers + 1)]
 stonesPlayed = [[] for i in range(numberOfPlayers)]

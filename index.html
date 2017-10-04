@@ -138,6 +138,9 @@
           drawBoard(data);
           drawStones(data);
         });
+
+      socket.on('reset', resetBoard);
+
     </script>
   </body>
 </html>

@@ -51,9 +51,9 @@
 
       var colorRGB = [[255,0,0], [0,0,255], [0,255,0], [255,165,0],
           [255,255,0], [128,0,128], [192,192,192],
-          [128,128,0], [0,128,128]]
+          [128,128,0], [0,128,128]];
 
-          moves = []
+      var moves = [];
 
       function drawStones(boardData)
       {
@@ -126,6 +126,11 @@
         }
 
         ctx.putImageData(imageData, 0, 0);
+      }
+
+      function resetBoard() {
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        moves = [];
       }
 
       socket.on('to_client', function(data)

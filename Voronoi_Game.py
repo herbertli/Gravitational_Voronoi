@@ -55,6 +55,7 @@ server = Voronoi_Server.Voronoi_Server('', PORT, numberOfPlayers)
 server.establishConnection(numberOfPlayers)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.sendto('reset'.encode('utf-8'), ('', 8080))
 
 players = [i for i in range(1, numberOfPlayers + 1)]
 stonesPlayed = [[] for i in range(numberOfPlayers)]
@@ -177,8 +178,16 @@ while (1):
 					scores[oldPlayer - 1] -= 1
 					scores[currentTurn] += 1
 
-	message = str(i) + " " + str(j) + " " + str(currentTurn + 1)
-	sock.sendto(message.encode('utf-8'), ('', 8080))
+        message = ""
+        for scoreList in scoreGrid:
+            message += " ".join(map(str, scoreList)) + " "
+	message += str(numberOfPlayers) + " " + str(currentTurn + 1) + " " + str(i) + " " + str(j)
+        # For some reason the previous architects decided to use UDP which has a 1500 byte sending limit
+        # so I'm just choosing to follow that and creating a work around. It's probably so that they didn't have to check if web.js was running and it could therefore work without graphical interface
+        sock.sendto('start'.encode('utf-8'), ('', 8080))
+        for i in range(0, len(message), 1000):
+            sock.sendto(message[i:i+1000].encode('utf-8'), ('', 8080))
+	sock.sendto('end'.encode('utf-8'), ('', 8080))
 
 	# -------------------------------------------------------------------------
 	# Assess winning/losing conditions

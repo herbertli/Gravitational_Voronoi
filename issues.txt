@@ -1,0 +1,3 @@
+- I also have a feeling there may be a problem with the scoring, it's as if they maybe don't count the stones themselves, but I guess since everyone has the same number of stones it ends up evening out anyway
+
+- We should make it clear that port 8080 and 10000 cannot be used for the server as those are used for graphics

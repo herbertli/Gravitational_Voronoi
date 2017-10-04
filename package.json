@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/huppy309/Gravitational_Voronoi.git"
+    "url": "git+https://github.com/guyu96/Gravitational_Voronoi.git"
   },
-  "author": "Emil Goldsmith Olesen <emil.goldsmith@gmail.com>",
+  "author": "Originally written by Anurag Dhaipule and Hassan Mujtaba Zaidi, upgraded by Guyu Fan and Emil Goldsmith Olesen",
   "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/huppy309/Gravitational_Voronoi/issues"
+    "url": "https://github.com/guyu96/Gravitational_Voronoi/issues"
   },
-  "homepage": "https://github.com/huppy309/Gravitational_Voronoi#readme",
+  "homepage": "https://github.com/guyu96/Gravitational_Voronoi#readme",
   "dependencies": {
     "socket.io": "^2.0.3"
   }

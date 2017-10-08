@@ -6,8 +6,6 @@
 
 - We should make number of players and stones be sent from the server to the client instead of passing it as commandline argument
 
-- We should make clients send names to us
-
 - We should make the graphical display show names associated with each color and the corresponding score
 
 - Of course update README to reflect changes at the end

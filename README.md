@@ -4,26 +4,20 @@ There are multiple ways to run the architect code. The instructions for doing so
 
 ## Running without Display
 
-The files relevant to this mode are available in the `local` directory and they apply to both your local machine and on energon since there is no display. The game server is run by the command:
-
 
 ```
 	python Voronoi_Game.py <Number of Stones> <Number of Players> <PORT Number>
 ```
 
-And the random client by:
+And the random test client by:
 
 ```
-	python Voronoi_Client.py <Number of Stones> <Number of Players> <PORT Number>
+	python Voronoi_Client.py <IP Address> <PORT Number>
 ```
 
-The ports for the game and the client need to be the same. If you want to test on energon, you may need to use:
+The ports for the game and the client need to be the same.
 
-```
-	module load python-2.7
-```
-
-The game server will wait for two clients to connect before prompting the user to 'Press Enter'. Once the user complies, the game will commence. At the end, the server will echo the final scores of all players and announce the winner or tied winners in the exceptional case. 
+The game server will wait for two clients to connect before prompting the user to 'Press Enter'. Beware that the order of play is decided by the order of connection of the clients. Once the user complies, the game will commence. At the end, the server will echo the final scores of all players and announce the winner or tied winners in the exceptional case. 
 
 The client `Voronoi_Client.py` implements a random algorithm to input the moves to the server. The input format is:
 

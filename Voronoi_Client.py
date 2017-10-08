@@ -8,14 +8,14 @@ def euclideanDistance(x1, y1, x2, y2):
     distance = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
     return math.sqrt(distance)
 
-HOST = 'localhost'    
-PORT = int(sys.argv[3])        
+HOST = sys.argv[1]
+PORT = int(sys.argv[2])
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
 # N == number of stones for the game
-N = int(sys.argv[1])
-numberOfPlayers = int(sys.argv[2])
+N, numberOfPlayers = map(int, s.recv(1024).split())
+s.sendall("TEST_NAME")
 
 grid = [[0] * 1000 for item in range(0, 1000)]
 

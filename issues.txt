@@ -2,6 +2,8 @@
 
 - We should make it clear that port 8080 and 10000 cannot be used for the server as those are used for graphics
 
+- We should also make it clear that the score is calculated by points on the grid, discretely
+
 - We should make number of players and stones be sent from the server to the client instead of passing it as commandline argument
 
 - We should make clients send names to us

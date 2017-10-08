@@ -13,21 +13,21 @@ def declareWinner(scores):
 	winner = [1]
 
 	if maxScore == -1:
-		print "Illegal move by Player 1"
+		print "Illegal move by " + server.names[0]
 
 	if maxScore == -2:
-		print "Player 1 timed out"
+		print server.names[0] + " timed out"
 
-	print "Player {} score: {}".format(1, scores[0])
+	print "{} score: {}".format(server.names[0], scores[0])
 
 	for i in range(1, len(scores)):
 		if scores[i] == -1:
-			print "Illegal move by Player {}".format(i + 1)
+			print "Illegal move by {}".format(server.names[i])
 
 		if scores[i] == -2:
-			print "Player {} timed out".format(i + 1)
+			print "{} timed out".format(server.names[i])
 
-		print "Player {} score: {}".format(i + 1, scores[i])
+		print "{} score: {}".format(server.names[i], scores[i])
 
 		if scores[i] == maxScore:
 			winner.append(i + 1)
@@ -36,11 +36,11 @@ def declareWinner(scores):
 			winner = [i + 1]
 
 	if len(winner) == 1:
-		print "\nWinner: Player {}".format(winner[0])
+		print "\nWinner: {}".format(server.names[winner[0] - 1])
 	else:
 		print "Tied between:"
 		for player in winner:
-			print "Player {}".format(player)
+                    print server.names[player - 1]
 
 # -----------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ sock.sendto('reset'.encode('utf-8'), ('', 8080))
 
 PORT = int(sys.argv[3])
 server = Voronoi_Server.Voronoi_Server('', PORT, numberOfPlayers)
-server.establishConnection(numberOfPlayers)
+server.establishConnection(numberOfPlayers, N)
 
 
 players = [i for i in range(1, numberOfPlayers + 1)]
@@ -106,7 +106,7 @@ while (1):
 	# Accept and validate player response
 	# -------------------------------------------------------------------------
 
-	print "Waiting for Player {}".format(currentTurn + 1)
+	print "Waiting for {}".format(server.names[currentTurn])
 	print "They have {} seconds remaining".format(timeForPlayers[currentTurn])
 	startTime = time.time()
 	playerResponse = ""
@@ -120,8 +120,8 @@ while (1):
 	i = int(data[0])
 	j = int(data[1])
 
-	print "Player {} has placed their stone on: {}, {}\n". \
-		format(currentTurn + 1, i, j)
+	print "{} has placed their stone on: {}, {}\n". \
+		format(server.names[currentTurn] , i, j)
 
         # GUYU: Maybe we can do something here so we support continuing the game if there are more than 2 players, but just eliminating the player that made the mistake?
 	# If a stone was already placed at the given position

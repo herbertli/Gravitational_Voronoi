@@ -24,11 +24,11 @@ class Voronoi_Server:
     input("Press Enter to continue...")
 
   def send(self, string, player):
-    self.connection[player].sendall(string.encode())
+    self.connection[player].sendall(string.encode('utf-8'))
 
   def receive(self, player):
     while(1):
-      data = self.connection[player].recv(1024).decode()
+      data = self.connection[player].recv(1024).decode('utf-8')
       # This looks weird right Guyu? Won't that while loop run forever if there's no data?
       while not data:
         continue

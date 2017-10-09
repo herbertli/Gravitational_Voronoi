@@ -20,7 +20,7 @@ s.sendall("TEST_NAME".encode())
 grid = [[0] * 1000 for item in range(0, 1000)]
 
 while 1:
-  serverResponse = s.recv(1024).decode()
+  serverResponse = s.recv(1024).decode('utf-8')
   data = serverResponse.split()
 
   # Check if the game has ended
@@ -29,7 +29,7 @@ while 1:
 
 
   # Construct the grid by placing all the moves so far
-  numberOfMoves = int(float(data[1]))
+  numberOfMoves = int(data[1])
   moves = []
   for item in range(0, numberOfMoves):
     i = int(data[2 + item * 3])
@@ -60,6 +60,6 @@ while 1:
       nextJ = randomJ
 
   print(nextI, nextJ)
-  s.sendall("{} {}".format(nextI, nextJ).encode())
+  s.sendall("{} {}".format(nextI, nextJ).encode('utf-8'))
 
 s.close()

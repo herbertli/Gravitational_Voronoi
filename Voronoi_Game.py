@@ -90,8 +90,7 @@ while (1):
   # S[1]  		 --> The number of moves that have been played so far
   # S[2, 3, 4 ...] --> i-coordinate, j-coordinate, and player
 
-
-  gameInfo = str(gameEnded) + " " + str(len(moves)/3)
+  gameInfo = str(gameEnded) + " " + str(int(len(moves) / 3))
   gameInfo += " " + " ".join(str(x) for x in moves)
 
   if gameEnded == 1:
@@ -179,15 +178,16 @@ while (1):
           scores[oldPlayer - 1] -= 1
           scores[currentTurn] += 1
 
-        message = ""
-        for scoreList in scoreGrid:
-            message += " ".join(map(str, scoreList)) + " "
-        message += str(numberOfPlayers) + " " + str(currentTurn + 1) + " " + str(i) + " " + str(j)
-        # For some reason the previous architects decided to use UDP which has a 1500 byte sending limit
-        # so I'm just choosing to follow that and creating a work around. It's probably so that they didn't have to check if web.js was running and it could therefore work without graphical interface
-        sock.sendto('start'.encode('utf-8'), ('', 8080))
-        for i in range(0, len(message), 1000):
-          sock.sendto(message[i:i+1000].encode('utf-8'), ('', 8080))
+  message = ""
+  for scoreList in scoreGrid:
+    message += " ".join(map(str, scoreList)) + " "
+  message += str(numberOfPlayers) + " " + str(currentTurn + 1) + " " + str(i) + " " + str(j)
+  # For some reason the previous architects decided to use UDP which has a 1500 byte sending limit
+  # so I'm just choosing to follow that and creating a work around. It's probably so that they didn't have to check if web.js was running and it could therefore work without graphical interface
+  sock.sendto('start'.encode('utf-8'), ('', 8080))
+  for i in range(0, len(message), 1000):
+    sock.sendto(message[i:i+1000].encode('utf-8'), ('', 8080))
+  
   sock.sendto('end'.encode('utf-8'), ('', 8080))
 
   # -------------------------------------------------------------------------

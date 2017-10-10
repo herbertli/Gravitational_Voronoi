@@ -1,89 +1,41 @@
 # Gravitational Voronoi
 
-There are multiple ways to run the architect code. The instructions for doing so are given below:
+This repository contains the architect code for Gravitational Voronoi. It consists of a game server, a sample client, and a web visualization interface that displays the game progress in real time (not complete).
 
-## Running without Display
+## The server
 
-
-```
-	python Voronoi_Game.py <Number of Stones> <Number of Players> <PORT Number>
-```
-
-And the random test client by:
+The server is written in Python 3. To run the server, execute:
 
 ```
-	python Voronoi_Client.py <IP Address> <PORT Number>
+python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port>
 ```
 
-The ports for the game and the client need to be the same.
+Note that ports 10000 and 8080 are reserved for the web interface, so please use some other port. After all clients have connected, press `<Enter>` to start the game.
 
-The game server will wait for two clients to connect before prompting the user to 'Press Enter'. Beware that the order of play is decided by the order of connection of the clients. Once the user complies, the game will commence. At the end, the server will echo the final scores of all players and announce the winner or tied winners in the exceptional case. 
+The server calculates the area of influence of each player discretely on a 1000 by 1000 grid. The final score of each player is the number of cells under the influence of that player.
 
-The client `Voronoi_Client.py` implements a random algorithm to input the moves to the server. The input format is:
+## The Client
 
-	`x y`
+In our implementation, there is no flag that indicates which client is the first (or second) player. Rather, player order is determined by the order in which each client connects to the server, i.e., the first client that connects to the server becomes the first player of the game.
 
-Where `x` and `y` are the coordinates of the board seperated by a space where the player wishes to place his stone. The server checks if the move is valid. In case of illegal moves, the game ends and the opponent is awarded with the win. Invalid moves include:
-
-* `x` and `y` being outside the  grid
-* Placing a stone on top of a previously placed stone
-* Placing a stone within a euclidean distance of 66 to any other stone
-
-For efficient socket communication, the server sends back only the moves made so far by each player. The client code has to reconstruct the grid (i.e. place all stones) each time. This is already done for you in the provided client (with negligible performance hit) so you can use that code. All ports and addresses are also hardcoded so all you need to do is write the algorithm and return the coordinates of where you want to place your stone for the current turn.
-
-This method of running is efficient if you want to quickly assess the performance and accuracy of your algorithm.
-
-## Running with Display on Localhost
-
-You run the `local` files as mentioned before but to run the display you perform the following additional steps:
-
-* Once you have started the game server and both clients have connected, before pressing the 'Enter' key, run:
+A sample client in Python (also 3) is provided. To run the sample client, execute:
 
 ```
-	node web.js <Number of Players>
+python3 voronoi_client.py <server-ip> <port>
 ```
 
-You will need to have node installed on your machine. The socket.io package is already present in the directory. 
+If you wish to write your own client, please follow the server-client communication protocol:
 
-* Open a tab in your web browser to `localhost:10000`. At this point you should see the game screen with an empty grid.
+1. After every client has successfully connected to the server, the server sends out a string `"<number-of-players> <number-of-stones>"` to each client. The string is delimited by a space
 
-* Now go back to your server code and press the 'Enter' key. The game should start and you should see the grid color appropriately after each successive move.
-
-**NOTE** 
-For each run, please do restart the web server and then refresh the html webpage before running the game. Otherwise, the display from previous runs corrupts the results for the new run. So the workflow is:
-
-* Start `Voronoi_Game.py`
-* Start all clients (`Voronoi_Client.py`)
-* Start the web server `web.js` (CTRL-C the previous one if applicable)
-* Refresh the html webpage i.e. `localhost:10000`
-* Revert back to the prompt by `Voronoi_Game.py` and press the 'Enter' key
-* Watch game progress on display/console
-* Breathe a sigh of relief
-
-## Running with Display on Energon
-
-To do this successfully, you need to do two important things:
-
-* Obtain the local IP address of your system. You do this by running the provided `getLocalIp.py` script. If this yields `127.0.0.1`, then you need to find the IP using any alternative method.
-
-* Place your game server and client code on energon2.
-
-* Change the following lines in the files as detailed below:
-
-	Voronoi_Game.py: line 181:
+2. After the initial broadcast, a client will only receive a game update message from the server when it is that client's turn. The game update message is again a string delimited by spaces. The first entry indicates if the game is over (`0` for game over, `1` otherwise). The second entry indicates the number of moves that have been played so far, counting all players. Finally, the moves themselves appear at the end of the string, and each move is represented by 3 entries - the row of the move, the column of the move, and the player that plays that move.
 
 ```
-	- sock.sendto(message.encode('utf-8'), ('', 8080))
-	+ sock.sentto(message.encode('utf-8'), (<local IP of your machine>, 8080))
+"<game-over> <number-of-moves-so-far> <move1-row> <move1-col> <move1-player> <move2-row> <move2-col> <move2-player> ..."
 ```
 
-You will run the game server and clients on energon2, and you will run `web.js` and the webpage `localhost:10000` on your machine.
+Note: `<move#-player>` is 1-indexed.
 
-## Submission
+## The display
 
-Please send us your client as well as a bash file that executes it. Also make sure to let us know if you require us to load a module for python. Email your clients to both of the following recipients:
-
-	ad3531@nyu.edu - Anurag Dhaipule
-	hmz224@nyu.edu - Hassan Mujtaba Zaidi
-
-	Team Zorro
+To be finished

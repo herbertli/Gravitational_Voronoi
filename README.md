@@ -14,7 +14,7 @@ Note that ports 10000 and 8080 are reserved for the web interface, so please use
 
 The server calculates the area of influence of each player discretely on a 1000 by 1000 grid. The final score of each player is the number of cells under the influence of that player.
 
-## The Client
+## The client
 
 In our implementation, there is no flag that indicates which client is the first (or second) player. Rather, player order is determined by the order in which each client connects to the server, i.e., the first client that connects to the server becomes the first player of the game.
 
@@ -36,6 +36,24 @@ If you wish to write your own client, please follow the server-client communicat
 
 Note: `<move#-player>` is 1-indexed.
 
-## The display
+## Running the game without display
+
+To run the game without the display, simply run the server with:
+
+```
+python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port>
+```
+
+and run each client with:
+
+```
+python3 voronoi_client.py <server-ip> <port>
+```
+
+or run your client.
+
+Finally, press `<Enter>` in the server terminal to start the game.
+
+# Running the game with display
 
 To be finished

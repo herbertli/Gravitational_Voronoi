@@ -26,17 +26,19 @@ python3 voronoi_client.py <server-ip> <port>
 
 If you wish to write your own client, please follow the server-client communication protocol:
 
-1. First, your client should connect to the server by sending your team name as a string to the server.
+1. Connect to server. Your client should connect to the server by sending your team name as a string to the server.
 
-2. After every client has successfully connected to the server, the server sends out a string `"<number-of-players> <number-of-stones>"` to each client. The string is delimited by a space.
+2. Receive game information. After every client has successfully connected to the server, the server sends out a string `"<number-of-players> <number-of-stones>"` to each client. The string is delimited by a space.
 
-3. After the initial broadcast, a client will only receive a game update message from the server when it is that client's turn. The game update message is again a string delimited by spaces. The first entry indicates if the game is over (`0` for game over, `1` otherwise). The second entry indicates the number of moves that have been played so far, counting all players. Finally, the moves themselves appear at the end of the string, and each move is represented by 3 entries - the row of the move, the column of the move, and the player that plays that move.
+3. Receive game updates. After the initial broadcast, a client will only receive a game update message from the server when it is that client's turn. The game update message is again a string delimited by spaces. The first entry indicates if the game is over (`0` for game over, `1` otherwise). The second entry indicates the number of moves that have been played so far, counting all players. Finally, the moves themselves appear at the end of the string, and each move is represented by 3 entries - the row of the move, the column of the move, and the player that plays that move.
 
 ```
 "<game-over> <number-of-moves-so-far> <move1-row> <move1-col> <move1-player> <move2-row> <move2-col> <move2-player> ..."
 ```
 
-Note: `<move#-player>` is 1-indexed.
+Note: for each move, the move row and move column is 0-indexed, while the move player is 1-indexed.
+
+4. Send move to server. After receiving an update from the server, the client should send a move to the server if the game is not over yet. The move is simply a string `"<move_row> <move_col>"` - row and column of the move separated by a space.
 
 ## Running the game without display
 
@@ -56,6 +58,6 @@ or run your client.
 
 Finally, press `<Enter>` in the server terminal to start the game.
 
-# Running the game with display
+## Running the game with display
 
 To be finished

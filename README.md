@@ -65,4 +65,4 @@ Finally, press `<Enter>` in the server terminal to start the game.
 
 ## Running the game with display
 
-To be finished
+Coming soon

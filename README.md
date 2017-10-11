@@ -33,11 +33,14 @@ If you wish to write your own client, please follow the server-client communicat
 3. Send team name. After receiving the game information, you should send your team name to the server as a string.
 
 4. Receive game updates. Your client will receive an update from the server when it is your turn. The update consists of three parts.
-  1. Game over flag. The flag is set to `1` when the game is over, and `0` otherwise
-  2. Scores. Say there are N players. Then there will be N numbers, representing the score from player 1 to player N.
-  3. New moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played.
+   1. Game over flag. The flag is set to `1` when the game is over, and `0` otherwise
+   2. Scores. Say there are N players. Then there will be N numbers, representing the score from player 1 to player N.
+   3. New moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played.
+
 Notice that every number in the game update is separated by a space, and at the very end there will be a new line character.
+
 The following represents what a general game update looks like. Note that the move row and move columns are **0-indexed**, and move players are **1-indexed**.
+
 ```
 "<game-over-flag> <score1> <score2> ... <move1-row> <move1-col> <move1-player> <move2-row> <move2-col> <move2-player> ...\n"
 ```

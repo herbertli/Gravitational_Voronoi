@@ -18,7 +18,7 @@ The server calculates the area of influence of each player discretely on a 1000 
 
 In our implementation, there is no flag that indicates which client is the first (or second) player. Rather, player order is determined by the order in which each client connects to the server, i.e., the first client that connects to the server becomes the first player of the game.
 
-A sample client in Python (also 3) is provided. To run the sample client, execute:
+A sample client in Python (also 3) is provided. Before running the client, we recommend that you change the name of your client to your team name in the client main routine. To run the sample client, execute:
 
 ```
 python3 voronoi_client.py <server-ip> <port>
@@ -26,9 +26,11 @@ python3 voronoi_client.py <server-ip> <port>
 
 If you wish to write your own client, please follow the server-client communication protocol:
 
-1. After every client has successfully connected to the server, the server sends out a string `"<number-of-players> <number-of-stones>"` to each client. The string is delimited by a space
+1. First, your client should connect to the server by sending your team name as a string to the server.
 
-2. After the initial broadcast, a client will only receive a game update message from the server when it is that client's turn. The game update message is again a string delimited by spaces. The first entry indicates if the game is over (`0` for game over, `1` otherwise). The second entry indicates the number of moves that have been played so far, counting all players. Finally, the moves themselves appear at the end of the string, and each move is represented by 3 entries - the row of the move, the column of the move, and the player that plays that move.
+2. After every client has successfully connected to the server, the server sends out a string `"<number-of-players> <number-of-stones>"` to each client. The string is delimited by a space.
+
+3. After the initial broadcast, a client will only receive a game update message from the server when it is that client's turn. The game update message is again a string delimited by spaces. The first entry indicates if the game is over (`0` for game over, `1` otherwise). The second entry indicates the number of moves that have been played so far, counting all players. Finally, the moves themselves appear at the end of the string, and each move is represented by 3 entries - the row of the move, the column of the move, and the player that plays that move.
 
 ```
 "<game-over> <number-of-moves-so-far> <move1-row> <move1-col> <move1-player> <move2-row> <move2-col> <move2-player> ..."

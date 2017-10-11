@@ -16,7 +16,7 @@ class VoronoiServer:
     for i in range(1, num_players + 1):
       print("Waiting for player " + str(i))
       self.connection[i - 1], self.address[i - 1] = self.my_socket.accept()
-      self.send(' '.join([str(num_players), str(num_stones)]) + "\n", i - 1)
+      self.send(str(num_players) + " " + str(num_stones) + " " + str(i) + "\n", i - 1)
       self.names[i - 1] = self.receive(i - 1).strip()
       print("Connection from Player " + self.names[i - 1] + " established.")
 

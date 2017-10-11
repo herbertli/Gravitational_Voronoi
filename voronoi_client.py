@@ -95,9 +95,9 @@ class Client:
     self.sock.close()
 
 if (__name__ == "__main__"):
-  name = "team_name_here"
   host = sys.argv[1]
   port = int(sys.argv[2])
+  name = sys.argv[3]
   # note: whoever connects to the server first plays first
   client = Client(host, port, name)
   client.start()

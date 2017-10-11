@@ -35,12 +35,18 @@ class VoronoiGame:
     # self.sock.accept()
   
   def __get_game_info(self):
-    game_info = "1" if self.game_over else "0"
-    game_info += " "
-    game_info += str(int(len(self.moves) / 3))
-    game_info += " "
-    game_info += " ".join(str(i) for i in self.moves)
-    game_info += "\n"
+    # game over flag
+    game_info = "1" if self.game_over else "0" + " "
+    # scores
+    game_info += " ".join(str(i) for i in self.scores) + " "
+    # new moves - go through move history in reverse order and stop when a move by current player is found
+    new_moves = []
+    for i in range(len(self.moves) - 1, 1, -3):
+      if (self.moves[i] == self.current_player + 1):
+        break
+      for j in range(3):
+        new_moves.append(self.moves[i - 2 + j])
+    game_info += " ".join(str(i) for i in new_moves) + "\n"
     return game_info
 
   def __broadcast_game_info(self):
@@ -80,16 +86,20 @@ class VoronoiGame:
 
   def __is_legal_move(self, row, col):
     if self.grid[row][col] != 0:
+      print("({}, {}) is already occupied".format(row, col))
       return False
     if row < 0 or row >= self.grid_size:
+      print("({}, {}) is out of bounds".format(row, col))
       return False
     if col < 0 or col >= self.grid_size:
+      print("({}, {}) is out of bounds".format(row, col))
       return False
     # check for min dist requirement
     for move_start in range(0, len(self.moves), 3):
       move_row = self.moves[move_start]
       move_col = self.moves[move_start + 1]
       if (self.__compute_distance(row, col, move_row, move_col) <= self.min_dist):
+        print("({}, {}) is less than 66 unit distances away from ({}, {})".format(row, col, move_row, move_col))
         return False
     
     return True

@@ -1,6 +1,6 @@
 # Gravitational Voronoi
 
-This repository contains the architect code for Gravitational Voronoi. It consists of a game server, a sample client, and a web visualization interface that displays the game progress in real time (not complete).
+This repository contains the architect code for Gravitational Voronoi. It consists of a game server, a sample client, and a web visualization interface that displays the game progress in real time. Currently, the visualization interface is not working properly, but a fix will be pushed shortly.
 
 ## The server
 
@@ -18,10 +18,10 @@ The server calculates the area of influence of each player discretely on a 1000 
 
 In our implementation, there is no flag that indicates which client is the first (or second) player. Rather, player order is determined by the order in which each client connects to the server, i.e., the first client that connects to the server becomes the first player of the game.
 
-A sample client in Python (also 3) is provided. Before running the client, we recommend that you change the name of your client to your team name in the client main routine. To run the sample client, execute:
+A sample client in Python 3 is provided. To run the sample client, execute:
 
 ```
-python3 voronoi_client.py <server-ip> <port>
+python3 voronoi_client.py <server-ip> <port> <team-name>
 ```
 
 If you wish to write your own client, please follow the server-client communication protocol:
@@ -58,7 +58,7 @@ python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port>
 and run each client with (if you are using the client provided here):
 
 ```
-python3 voronoi_client.py <server-ip> <port>
+python3 voronoi_client.py <server-ip> <port> <team-name>
 ```
 
 Finally, press `<Enter>` in the server terminal to start the game.

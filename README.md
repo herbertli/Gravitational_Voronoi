@@ -26,35 +26,39 @@ python3 voronoi_client.py <server-ip> <port>
 
 If you wish to write your own client, please follow the server-client communication protocol:
 
-1. Connect to server. Your client should connect to the server by sending your team name as a string to the server.
+1. Connect your client to the server.
 
-2. Receive game information. After every client has successfully connected to the server, the server sends out a string `"<number-of-players> <number-of-stones>"` to each client. The string is delimited by a space.
+2. Receive game information. After connecting your client to the server, you should receive the game information from the server in the format of `"<number-of-players> <number-of-stones>\n"`. The string is delimited by a space and ends with a new line character.
 
-3. Receive game updates. After the initial broadcast, a client will only receive a game update message from the server when it is that client's turn. The game update message is again a string delimited by spaces. The first entry indicates if the game is over (`0` for game over, `1` otherwise). The second entry indicates the number of moves that have been played so far, counting all players. Finally, the moves themselves appear at the end of the string, and each move is represented by 3 entries - the row of the move, the column of the move, and the player that plays that move.
+3. Send team name. After receiving the game information, you should send your team name to the server as a string.
 
+4. Receive game updates. Your client will receive an update from the server when it is your turn. The update consists of three parts.
+⋅⋅1. Game over flag. The flag is set to `1` when the game is over, and `0` otherwise
+⋅⋅2. Scores. Say there are N players. Then there will be N numbers, representing the score from player 1 to player N.
+⋅⋅3. New moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played.
+Notice that every number in the game update is separated by a space, and at the very end there will be a new line character.
+The following represents what a general game update looks like. Note that the move row and move columns are **0-indexed**, and move players are **1-indexed**.
 ```
-"<game-over> <number-of-moves-so-far> <move1-row> <move1-col> <move1-player> <move2-row> <move2-col> <move2-player> ..."
+"<game-over-flag> <score1> <score2> ... <move1-row> <move1-col> <move1-player> <move2-row> <move2-col> <move2-player> ...\n"
 ```
 
-Note: for each move, the move row and move column is 0-indexed, while the move player is 1-indexed.
+Note: for each move, the move row and move column are 0-indexed, while the move player is 1-indexed.
 
-4. Send move to server. After receiving an update from the server, the client should send a move to the server if the game is not over yet. The move is simply a string `"<move_row> <move_col>"` - row and column of the move separated by a space.
+5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. The move should simply be a string `"<move_row> <move_col>"` - row and column of the move separated by a space.
 
 ## Running the game without display
 
-To run the game without the display, simply run the server with:
+To run the game without the display, run the server with:
 
 ```
 python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port>
 ```
 
-and run each client with:
+and run each client with (if you are using the client provided here):
 
 ```
 python3 voronoi_client.py <server-ip> <port>
 ```
-
-or run your client.
 
 Finally, press `<Enter>` in the server terminal to start the game.
 

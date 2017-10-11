@@ -13,7 +13,7 @@ class Client:
 
     # connect to server and get game info
     self.sock.connect((host, port))
-    self.num_players, self.num_stones = map(int, self.__receive_move())
+    self.num_players, self.num_stone, self.player_number = map(int, self.__receive_move())
     self.grid = [[0] * self.grid_size for i in range(self.grid_size)]
     self.moves = [] # store history of moves
     
@@ -58,26 +58,37 @@ class Client:
   def start(self):
     while True:
       move_data = self.__receive_move()
-      
-      # construct list of moves, and update grid
-      # note: we are reconstructing the list of moves at each turn, because it is the easiest thing to do, especially when there might be more than 2 players during melee games
-      num_moves = int(move_data[1])
-      for i in range(num_moves):
-        move_row = int(move_data[2 + 3 * i])
-        move_col = int(move_data[2 + 3 * i + 1])
-        player = int(move_data[2 + 3 * i + 2])
-        # sanity check, this should always be true
-        if player > 0:
-          self.grid[move_row][move_col] = player
-          self.moves.append((move_row, move_col, player))
-      
       # check if game is over
       if int(move_data[0]) == 1:
         print("Game over")
         break
 
-      # game not over, make move
+      # scores
+      scores = []
+      for i in range(self.num_players):
+        scores.append(move_data[i + 1])
+      # new moves
+      new_moves = move_data[self.num_players + 1 : ]
+      num_new_moves = int(len(new_moves) / 3)
+      # sanity check
+      if num_new_moves * 3 != len(new_moves):
+        print("Error: error parsing list of new moves")
+      
+      # insert new moves into the grid
+      for i in range(num_new_moves):
+        move_row = int(new_moves[3 * i])
+        move_col = int(new_moves[3 * i + 1])
+        player = int(new_moves[3 * i + 2])
+        # sanity check, this should always be true
+        if player > 0:
+          self.grid[move_row][move_col] = player
+          self.moves.append((move_row, move_col, player))
+        else:
+          print("Error: player info incorrect")
+
+      # make move
       my_move_row, my_move_col = self.__getMove()
+      self.moves.append((my_move_row, my_move_col, self.player_number))
       self.__send_move(my_move_row, my_move_col)
       print("Played at row {}, col {}".format(my_move_row, my_move_col))
     

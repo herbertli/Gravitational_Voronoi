@@ -40,6 +40,7 @@ class VoronoiGame:
     game_info += str(int(len(self.moves) / 3))
     game_info += " "
     game_info += " ".join(str(i) for i in self.moves)
+    game_info += "\n"
     return game_info
 
   def __broadcast_game_info(self):

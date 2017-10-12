@@ -7,10 +7,12 @@ This repository contains the architect code for Gravitational Voronoi. It consis
 The server is written in Python 3. To run the server, execute:
 
 ```
-python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port>
+python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> [<use-graphics>]
 ```
 
-Note that ports 10000 and 8080 are reserved for the web interface, so please use some other port. After all clients have connected, press `<Enter>` to start the game.
+The last commandline argument `<use-graphics>` is optional and graphics are only activated if you pass a 1 for this argument.
+
+Also note that ports 10000 and 8080 are reserved for the web interface, so please use some other port. After all clients have connected, press `<Enter>` to start the game.
 
 The server calculates the area of influence of each player discretely on a 1000 by 1000 grid. The final score of each player is the number of cells under the influence of that player.
 
@@ -65,4 +67,24 @@ Finally, press `<Enter>` in the server terminal to start the game.
 
 ## Running the game with display
 
-Coming soon
+First you must make sure you have `node.js` and `npm` installed. You also need relatively modern versions of both `node.js` and the browser you will be using for the display, though nothing bleeding edge is needed. But if you have any errors the first debugging suggestions would be to upgrade your browser/`node.js`
+
+Now first install the single dependency (socket.io) if you haven't already
+
+```
+npm install
+```
+
+to run the game with the display first run the web server
+
+```
+node web.js
+```
+
+and then open `localhost:10000` in your browser. You are now ready to run as many games as you want using basically the same approach as without a display, the only difference is to add a `1` to the server command from above like so:
+
+```
+python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> 1
+```
+
+Every time you start a new server the board will reset on your display.

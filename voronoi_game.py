@@ -36,7 +36,7 @@ class VoronoiGame:
   
   def __get_game_info(self):
     # game over flag
-    game_info = "1" if self.game_over else "0" + " "
+    game_info = ("1" if self.game_over else "0") + " "
     # scores
     game_info += " ".join(str(i) for i in self.scores) + " "
     # new moves - go through move history in reverse order and stop when a move by current player is found

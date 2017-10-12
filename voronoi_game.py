@@ -206,10 +206,9 @@ if __name__ == "__main__":
   num_players = int(sys.argv[2])
   host = sys.argv[3]
   port = int(sys.argv[4])
-
-  answer = input("Are you using the graphic display and already started the web.js server? (y/N)")
-  # As shown by the (Y/n) yes is the default answer
-  use_graphic = answer == 'y'
+  use_graphic = False
+  if len(sys.argv) == 6 and int(sys.argv[5]) == 1:
+      use_graphic = True
 
   game = VoronoiGame(num_stones, num_players, GRID_SIZE, MIN_DIST, host, port, use_graphic)
   game.start()

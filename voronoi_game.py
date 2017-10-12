@@ -3,7 +3,7 @@ from voronoi_server import VoronoiServer
 import time, sys, math, socket
 
 class VoronoiGame:
-  def __init__(self, num_stones, num_players, grid_size, min_dist, host, port):
+  def __init__(self, num_stones, num_players, grid_size, min_dist, host, port, use_graphic):
     # game variables
     self.num_stones = num_stones
     self.num_players = num_players
@@ -26,14 +26,12 @@ class VoronoiGame:
     # server that communicates to client
     self.server = VoronoiServer(host, port, num_players)
     # socket connection to web front end (udp)
-    self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    self.use_graphic = use_graphic
+    self.graphic_socket = None
+    if use_graphic:
+      self.graphic_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      self.graphic_socket.connect(('localhost', 8080))
 
-    # TCP version
-    # self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # self.sock.bind(('', port))
-    # self.sock.listen(1)
-    # self.sock.accept()
-  
   def __get_game_info(self):
     # game over flag
     game_info = ("1" if self.game_over else "0") + " "
@@ -61,25 +59,12 @@ class VoronoiGame:
     data = ''
     for score_row in self.score_grid:
       data += ' '.join(map(str, score_row)) + ' '
+    data += ' '.join(map(str, self.scores)) + ' '
     data += '{} {} '.format(self.num_players, self.current_player + 1)
     data += '{} {}'.format(move_row, move_col)
-    
-    # TCP version
-    # self.sock.sendall(data.encode('utf-8'))
+    data += '\n' # signify the end of the message
 
-    # send header
-    self.sock.sendto('start'.encode('utf-8'), ('', 8080))
-    # send body in parts
-    total_bytes = len(data)
-    part_size = 1024
-    num_parts = total_bytes // part_size
-    remainder_size = total_bytes - part_size * num_parts
-    for i in range(num_parts):
-      self.sock.sendto(data[i * part_size : (i + 1) * part_size].encode(), ('', 8080))
-    if remainder_size > 0:
-      self.sock.sendto(data[num_parts * part_size: num_parts * part_size + remainder_size].encode(), ('', 8080))
-    # send footer
-    self.sock.sendto('end'.encode('utf-8'), ('', 8080))
+    self.graphic_socket.sendall(data.encode('utf-8'))
 
   def __compute_distance(self, row1, col1, row2, col2):
     return math.sqrt((row2 - row1)**2 + (col2 - col1)**2)
@@ -167,10 +152,12 @@ class VoronoiGame:
       print("Tied between: ")
       for winner in winners:
         print(" ".join([self.server.names[w - 1] for w in winners]))
-  
+
   def start(self):
     self.server.establish_connection(self.num_players, self.num_stones)
-    self.sock.sendto('reset'.encode('utf-8'), ('', 8080))
+    if self.use_graphic:
+      graphic_init_msg = ' '.join(self.server.names) + '\n'
+      self.graphic_socket.sendall(graphic_init_msg.encode('utf-8'))
     print('\nStarting...\n')
 
     while True:
@@ -196,7 +183,8 @@ class VoronoiGame:
       self.__update_scores(move_row, move_col)
 
       # send data to node server
-      self.__send_update_to_node(move_row, move_col)
+      if self.use_graphic:
+        self.__send_update_to_node(move_row, move_col)
 
       # check for game over conditions
       if self.player_times[self.current_player] < 0:
@@ -218,6 +206,10 @@ if __name__ == "__main__":
   num_players = int(sys.argv[2])
   host = sys.argv[3]
   port = int(sys.argv[4])
-  
-  game = VoronoiGame(num_stones, num_players, GRID_SIZE, MIN_DIST, host, port)
+
+  answer = input("Are you using the graphic display and already started the web.js server? (y/N)")
+  # As shown by the (Y/n) yes is the default answer
+  use_graphic = answer == 'y'
+
+  game = VoronoiGame(num_stones, num_players, GRID_SIZE, MIN_DIST, host, port, use_graphic)
   game.start()

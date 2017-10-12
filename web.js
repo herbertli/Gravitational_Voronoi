@@ -1,6 +1,5 @@
 var http = require('http');
 var fs = require('fs');
-net = require('net');
 
 var webserver = http.createServer(function (request, response)
 {
@@ -12,38 +11,40 @@ var webserver = http.createServer(function (request, response)
 }).listen(10000);
 
 var io = require('socket.io')(webserver);
+console.log("Webserver socket listening on 127.0.0.1:10000");
 
 // ----------------------------------------------------------------------------
 
-const dgram = require('dgram');
-const server = dgram.createSocket('udp4');
 const StringDecoder = require('string_decoder').StringDecoder;
 const decoder = new StringDecoder('utf8');
 
-server.bind(8080, '');
+// Set up the TCP server to communicate with the game server
+const net = require('net');
+const gameServer = net.createServer();
+const PORT = 8080;
+const HOST = '127.0.0.1';
+gameServer.listen(PORT, HOST);
+console.log(`Game server socket listening on ${HOST}:${PORT}`);
 
-server.on('error', function(err){
-  console.log('server error:\n${err.stack}');
-  server.close();
-});
-
-let buffer;
-
-server.on('message', function(msg, rinfo){
-
-  msg = decoder.write(msg);
-  if (msg === 'reset') {
-    io.sockets.emit('reset', '')
-  } else if (msg === 'start') {
-    buffer = '';
-  } else if (msg === 'end') {
-    io.sockets.emit('to_client', buffer);
-  } else {
-    buffer += msg;
+// All this server does is simply relay the information to the web client
+let connectedClients = 0
+gameServer.on('connection', sock => {
+  if (connectedClients > 0) {
+    console.log(`Only one game server can be connected at a time, refusing connection from ${sock.remoteAddress}:${sock.remotePort}`);
+    return;
   }
-});
+  connectedClients++;
+  console.log(`Game server connected from ${sock.remoteAddress}:${sock.remotePort}`);
+  // Since this is a new client we reset the web interface
+  io.sockets.emit('to_client', 'reset\n');
 
-server.on('listening', function(){
-  var address = server.address();
-  console.log('server listening');
+  // What to do when we get data
+  sock.on('data', data => {
+    io.sockets.emit('to_client', decoder.write(data));
+  })
+
+  sock.on('close', () => {
+    connectedClients--;
+    console.log(`Game server ${sock.remoteAddress}:${sock.remotePort} disconnected`);
+  });
 });

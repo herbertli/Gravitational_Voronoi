@@ -45,6 +45,7 @@
       var canvasHeight = canvas.height;
       var boardSize = canvasWidth;
       var ctx = canvas.getContext('2d');
+      var initiated = false;
 
       var colors = ['red', 'blue', 'green', 'orange', 'yellow', 'purple',
           'silver', 'olive', 'teal'];
@@ -111,7 +112,7 @@
           {
             var index = (y * 1000 + x) * 4;
 
-            player = parseInt(board[index/4]);
+            var player = parseInt(board[index/4]);
 
             if(player > 0)
             {
@@ -128,19 +129,52 @@
         ctx.putImageData(imageData, 0, 0);
       }
 
+      function init(names) {
+        names = names.split(" "); // array of names
+        var numPlayers = names.length;
+        // Do something with the names
+        console.log(names);
+      }
+
+      function updateScores(boardData) {
+        var board = boardData.split(" ");
+        var numberOfPlayers = parseInt([board[board.length - 4]]);
+        var scores = board.slice(board.length - 4 - numberOfPlayers, board.length - 4).map(x => parseInt(x));
+        // Do something with scores
+        console.log(scores);
+      }
+
       function resetBoard() {
+        initiated = false;
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         moves = [];
+        // GUYU: DO SOMETHING LIKE names = []; TO RESET NAMES HERE
       }
+
+      var buffer = '';
 
       socket.on('to_client', function(data)
         {
-          drawBoard(data);
-          drawStones(data);
+          buffer += data;
+          if (buffer[buffer.length - 1] == '\n') {
+            // We know it's the end of the message
+            // Remove the newline character
+            buffer = buffer.slice(0, -1);
+            if (buffer == 'reset') {
+              resetBoard();
+            } else if (!initiated) {
+              init(buffer);
+              initiated = true;
+            } else {
+              // Drawing data
+              drawBoard(buffer);
+              drawStones(buffer);
+              updateScores(buffer);
+            }
+            // Reset buffer for next message
+            buffer = '';
+          }
         });
-
-      socket.on('reset', resetBoard);
-
     </script>
   </body>
 </html>

@@ -12,7 +12,7 @@ class VoronoiGame:
     self.grid = [[0] * grid_size for i in range(grid_size)]
     self.score_grid = [[0] * grid_size for i in range(grid_size)]
     self.scores = [0] * num_players
-    self.player_times = [120] * num_players
+    self.player_times = [120.0] * num_players
     # store moves played, each move corresponds to 3 entries
     self.moves = []
     # gravitational pull, pull[i] is 2d-array of the pull player i has in total
@@ -101,7 +101,7 @@ class VoronoiGame:
       if (self.__compute_distance(row, col, move_row, move_col) <= self.min_dist):
         print("({}, {}) is less than 66 unit distances away from ({}, {})".format(row, col, move_row, move_col))
         return False
-    
+
     return True
 
   def __get_player_move(self):
@@ -109,7 +109,7 @@ class VoronoiGame:
     player_time = self.player_times[self.current_player]
     print("Waiting for {}".format(player_name))
     print("They have {} seconds remaining".format(player_time))
-    
+
     start_time = time.time()
     client_response = self.server.receive(self.current_player)
     end_time = time.time()
@@ -141,7 +141,7 @@ class VoronoiGame:
             self.score_grid[row][col] = self.current_player + 1
             self.scores[old_occupier - 1] -= 1
             self.scores[self.current_player] += 1
-  
+
   def __declare_winner(self):
     max_score = -1
     winners = []
@@ -154,7 +154,7 @@ class VoronoiGame:
         print("{} timed out".format(player_name))
       else:
         print("{} score: {}".format(player_name, player_score))
-      
+
       if player_score == max_score:
         winners.append(i + 1)
       elif player_score > max_score:
@@ -178,7 +178,7 @@ class VoronoiGame:
       self.__broadcast_game_info()
       if (self.game_over):
         break
-      
+
       # get and validate move
       move_row, move_col = self.__get_player_move()
       print("{} has placed their stone on: {}, {}\n".format(self.server.names[self.current_player] , move_row, move_col))
@@ -186,7 +186,7 @@ class VoronoiGame:
         self.scores[self.current_player] = -1
         self.game_over = True
         continue
-      
+
       # move is legal, do some book-keeping
       self.moves_made += 1
       self.grid[move_row][move_col] = self.current_player + 1
@@ -204,7 +204,7 @@ class VoronoiGame:
         self.game_over = True
       if self.moves_made == self.num_players * self.num_stones:
         self.game_over = True
-      
+
       # switch player
       self.current_player += 1
 

@@ -20,7 +20,7 @@ class VoronoiServer:
       self.names[i - 1] = self.receive(i - 1).strip()
       print("Connection from Player " + self.names[i - 1] + " established.")
 
-    input("Press Enter to continue...")
+    input("Press Enter to start the game...")
 
   def send(self, string, player):
     self.connection[player].sendall(string.encode('utf-8'))

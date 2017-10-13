@@ -83,7 +83,7 @@ class VoronoiGame:
     for move_start in range(0, len(self.moves), 3):
       move_row = self.moves[move_start]
       move_col = self.moves[move_start + 1]
-      if (self.__compute_distance(row, col, move_row, move_col) <= self.min_dist):
+      if (self.__compute_distance(row, col, move_row, move_col) < self.min_dist):
         print("({}, {}) is less than 66 unit distances away from ({}, {})".format(row, col, move_row, move_col))
         return False
 

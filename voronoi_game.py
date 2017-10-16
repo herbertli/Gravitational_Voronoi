@@ -60,10 +60,35 @@ class VoronoiGame:
     else:
       self.server.send(game_info, self.current_player)
 
-  def __send_update_to_node(self, move_row, move_col):
-    data = ''
+  def __generate_compressed_game_bitmap(self):
+    # Compression format is start_index end_index (inclusive) player_owner
+    bitmap = ''
     for score_row in self.score_grid:
-      data += ' '.join(map(str, score_row)) + ' '
+      bitmap += '0 '
+      for i in range(1, len(score_row)):
+        if score_row[i] != score_row[i-1]:
+          # End this compression range and start the next one
+          bitmap += '{} {} {} '.format(str(i - 1), str(score_row[i-1]), str(i))
+      # End the final range
+      bitmap += '{} {} '.format(str(len(score_row) - 1), str(score_row[-1]))
+    return bitmap
+
+  def __generate_decompressed_game_bitmap(self, compressed_bitmap):
+    # This was just written for testing correct (de)compression
+    i = 0
+    compressed_bitmap_array = compressed_bitmap.split(' ')
+    decompressed_bitmap = ''
+    for j in range(0, 10**7, 3):
+      decompressed_bitmap += (compressed_bitmap_array[j + 2] + ' ') * (int(compressed_bitmap_array[j + 1]) - int(compressed_bitmap_array[j]) + 1)
+      if compressed_bitmap_array[j + 1] == '999':
+        i += 1
+        if i == 1000:
+          break
+    return decompressed_bitmap
+
+  def __send_update_to_node(self, move_row, move_col):
+    data = self.__generate_compressed_game_bitmap()
+    # Add rest of meta data
     data += ' '.join(map(str, self.scores)) + ' '
     data += '{} {} '.format(self.num_players, self.current_player + 1)
     data += '{} {}'.format(move_row, move_col)

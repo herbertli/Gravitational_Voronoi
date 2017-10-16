@@ -87,12 +87,31 @@
         }
       }
 
+      function decompressBitmap(boardData) {
+        const numericBoard = boardData.split(" ").map(Number);
+        const decompressedBoard = [];
+        let i = 0;
+        for (let j = 0;; j += 3) {
+          for (let k = numericBoard[j]; k <= numericBoard[j + 1]; k++) {
+            decompressedBoard.push(numericBoard[j + 2]);
+          }
+          if (numericBoard[j + 1] === 999) {
+            i += 1
+            if (i === 1000) {
+              break;
+            }
+          }
+        }
+        return decompressedBoard;
+      }
+
       function drawBoard(boardData)
       {
         var board = boardData.split(" ");
         var j = parseInt(board[board.length - 1]);
         var i = parseInt(board[board.length - 2]);
         var numberOfPlayers = parseInt([board[board.length - 4]]);
+        board = decompressBitmap(boardData);
 
         if (moves.length == 0)
         {

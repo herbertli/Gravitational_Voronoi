@@ -67,7 +67,7 @@ Finally, press `<Enter>` in the server terminal to start the game.
 
 ## Running the game with display
 
-First you must make sure you have `node.js` and `npm` installed. You also need relatively modern versions of both `node.js` and the browser you will be using for the display, though nothing bleeding edge is needed. But if you encounter any errors, you shoud always try upgrading your browser/`node.js` first.
+First you must make sure you have `node.js` and `npm` installed. You also need relatively modern versions of both `node.js` and the browser you will be using for the display, though nothing bleeding edge is needed. But if you encounter any errors, you should always try upgrading your browser/`node.js` first.
 
 Now first install the single dependency (socket.io) if you haven't already:
 

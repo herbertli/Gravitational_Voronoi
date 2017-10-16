@@ -9,7 +9,7 @@ class VoronoiGame:
     self.num_stones = num_stones
     self.num_players = num_players
     self.grid_size = grid_size
-    self.min_dist = min_dist # minimum distance allowed between stoens
+    self.min_dist = min_dist # minimum distance allowed between stones
     self.grid = np.zeros((grid_size, grid_size), dtype=np.int)
     self.score_grid = np.zeros((grid_size, grid_size), dtype=np.int)
     self.scores = [0] * num_players
@@ -31,6 +31,7 @@ class VoronoiGame:
       self.graphic_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.graphic_socket.connect(('localhost', 8080))
 
+    # Used for compute pull. row_numbers and col_numbers are simply constant matrices with the value of the current row/col index
     self.row_numbers = np.zeros((grid_size, grid_size), dtype=np.float32)
     for i in range(grid_size):
       self.row_numbers[i] = self.row_numbers[i] + i
@@ -108,14 +109,20 @@ class VoronoiGame:
     return int(data[0]), int(data[1])
 
   def compute_pull(self, row, col):
+    # squared_distance_matrix[i][j] is the squared distance from (i, j) to (row, col)
     squared_distance_matrix = np.square(self.row_numbers - row) + np.square(self.col_numbers - col)
+    # This value would otherwise have been 0 and would therefore have caused an exception when taking the reciprocal
     squared_distance_matrix[row][col] = 0.1e-30
+    # After taking the reciprocal it correctly indicates the pull added at at (i, j) by having a stone at (row, col)
     return np.reciprocal(squared_distance_matrix)
 
   def __update_scores(self, move_row, move_col):
+    # Add pull from new stone to current pull
     self.pull[self.current_player] = self.pull[self.current_player] + self.compute_pull(move_row, move_col)
+    # Update each point in the grid to be owned by the player with the highest pull
     self.score_grid = np.argmax(self.pull, axis=0) + 1
 
+    # For each player set the score to be the sum of owned squares on the grid
     for i in range(self.num_players):
       self.scores[i] = np.sum(self.score_grid == (i+1))
 

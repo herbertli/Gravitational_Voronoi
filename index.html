@@ -32,6 +32,9 @@
       Gravitational Voronoi
     </h1>
 
+    <div id="player-info">
+    </div>
+
     <canvas id="canvas" width="1000" height="1000">
       Your browser does not support the HTML5 canvas tag.
     </canvas>
@@ -56,8 +59,7 @@
 
       var moves = [];
 
-      function drawStones(boardData)
-      {
+      function drawStones(boardData) {
         var board = boardData.split(" ");
         var j = parseInt(board[board.length - 1]);
         var i = parseInt(board[board.length - 2]);
@@ -105,8 +107,7 @@
         return decompressedBoard;
       }
 
-      function drawBoard(boardData)
-      {
+      function drawBoard(boardData) {
         var board = boardData.split(" ");
         var j = parseInt(board[board.length - 1]);
         var i = parseInt(board[board.length - 2]);
@@ -148,26 +149,52 @@
         ctx.putImageData(imageData, 0, 0);
       }
 
+      function getInfoComponent(name, index) {
+        var infoComponent = document.createElement('p');
+        var nameSpan = document.createElement('span');
+        var colorSpan = document.createElement('span');
+        var scoreSpan = document.createElement('span');
+
+        infoComponent.setAttribute('player-id', index.toString());
+        nameSpan.classList.add('player-name');
+        nameSpan.textContent = name;
+        colorSpan.classList.add('player-color');
+        colorSpan.style.color = colors[index];
+        scoreSpan.classList.add('player-score');
+        scoreSpan.textContent = '0';
+
+        infoComponent.appendChild(nameSpan);
+        infoComponent.appendChild(colorSpan);
+        infoComponent.appendChild(scoreSpan);
+
+        return infoComponent;
+      }
+
       function init(names) {
-        names = names.split(" "); // array of names
-        var numPlayers = names.length;
-        // Do something with the names
-        console.log(names);
+        var nameArr = names.split(" ");
+        var infoDiv = document.getElementById('player-info');
+        for (var i = 0; i < nameArr.length; i++) {
+          infoDiv.appendChild(getInfoComponent(nameArr[i], i));
+        }
       }
 
       function updateScores(boardData) {
+        console.log(typeof(boardData));
         var board = boardData.split(" ");
         var numberOfPlayers = parseInt([board[board.length - 4]]);
         var scores = board.slice(board.length - 4 - numberOfPlayers, board.length - 4).map(x => parseInt(x));
-        // Do something with scores
-        console.log(scores);
+        var playerInfo = document.querySelectorAll('#player-info p');
+        playerInfo.forEach(function(info) {
+          var i = parseInt(info.getAttribute('player-id'));
+          info.querySelector('.player-score').textContent = scores[i].toString();
+        });
       }
 
       function resetBoard() {
         initiated = false;
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         moves = [];
-        // GUYU: DO SOMETHING LIKE names = []; TO RESET NAMES HERE
+        document.getElementById('player-info').innerHTML = "";
       }
 
       var buffer = '';

@@ -108,7 +108,9 @@ class VoronoiGame:
     return int(data[0]), int(data[1])
 
   def compute_pull(self, row, col):
-    return np.reciprocal(np.square(self.row_numbers - row) + np.square(self.col_numbers - col) + 0.1e-30)
+    squared_distance_matrix = np.square(self.row_numbers - row) + np.square(self.col_numbers - col)
+    squared_distance_matrix[row][col] = 0.1e-30
+    return np.reciprocal(squared_distance_matrix)
 
   def __update_scores(self, move_row, move_col):
     self.pull[self.current_player] = self.pull[self.current_player] + self.compute_pull(move_row, move_col)

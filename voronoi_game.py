@@ -1,7 +1,6 @@
 from voronoi_server import VoronoiServer
 
 import time, sys, math, socket
-import numpy as np
 
 class VoronoiGame:
   def __init__(self, num_stones, num_players, grid_size, min_dist, host, port, use_graphic):
@@ -9,15 +8,17 @@ class VoronoiGame:
     self.num_stones = num_stones
     self.num_players = num_players
     self.grid_size = grid_size
-    self.min_dist = min_dist # minimum distance allowed between stones
-    self.grid = np.zeros((grid_size, grid_size), dtype=np.int)
-    self.score_grid = np.zeros((grid_size, grid_size), dtype=np.int)
+    self.min_dist = min_dist # minimum distance allowed between stoens
+    self.grid = [[0] * grid_size for i in range(grid_size)]
+    self.score_grid = [[0] * grid_size for i in range(grid_size)]
     self.scores = [0] * num_players
     self.player_times = [120.0] * num_players
     # store moves played, each move corresponds to 3 entries
     self.moves = []
     # gravitational pull, pull[i] is 2d-array of the pull player i has in total
-    self.pull = np.zeros((num_players, grid_size, grid_size), dtype=np.float32)
+    self.pull = []
+    for i in range(num_players):
+      self.pull.append([[0] * grid_size for j in range(grid_size)])
     self.current_player = 0
     self.moves_made = 0
     self.game_over = False
@@ -30,12 +31,6 @@ class VoronoiGame:
     if use_graphic:
       self.graphic_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.graphic_socket.connect(('localhost', 8080))
-
-    # Used for compute pull. row_numbers and col_numbers are simply constant matrices with the value of the current row/col index
-    self.row_numbers = np.zeros((grid_size, grid_size), dtype=np.float32)
-    for i in range(grid_size):
-      self.row_numbers[i] = self.row_numbers[i] + i
-    self.col_numbers = np.transpose(self.row_numbers)
 
   def __get_game_info(self):
     # game over flag
@@ -60,35 +55,10 @@ class VoronoiGame:
     else:
       self.server.send(game_info, self.current_player)
 
-  def __generate_compressed_game_bitmap(self):
-    # Compression format is start_index end_index (inclusive) player_owner
-    bitmap = ''
-    for score_row in self.score_grid:
-      bitmap += '0 '
-      for i in range(1, len(score_row)):
-        if score_row[i] != score_row[i-1]:
-          # End this compression range and start the next one
-          bitmap += '{} {} {} '.format(str(i - 1), str(score_row[i-1]), str(i))
-      # End the final range
-      bitmap += '{} {} '.format(str(len(score_row) - 1), str(score_row[-1]))
-    return bitmap
-
-  def __generate_decompressed_game_bitmap(self, compressed_bitmap):
-    # This was just written for testing correct (de)compression
-    i = 0
-    compressed_bitmap_array = compressed_bitmap.split(' ')
-    decompressed_bitmap = ''
-    for j in range(0, 10**7, 3):
-      decompressed_bitmap += (compressed_bitmap_array[j + 2] + ' ') * (int(compressed_bitmap_array[j + 1]) - int(compressed_bitmap_array[j]) + 1)
-      if compressed_bitmap_array[j + 1] == '999':
-        i += 1
-        if i == 1000:
-          break
-    return decompressed_bitmap
-
   def __send_update_to_node(self, move_row, move_col):
-    data = self.__generate_compressed_game_bitmap()
-    # Add rest of meta data
+    data = ''
+    for score_row in self.score_grid:
+      data += ' '.join(map(str, score_row)) + ' '
     data += ' '.join(map(str, self.scores)) + ' '
     data += '{} {} '.format(self.num_players, self.current_player + 1)
     data += '{} {}'.format(move_row, move_col)
@@ -133,23 +103,29 @@ class VoronoiGame:
     data = client_response.split()
     return int(data[0]), int(data[1])
 
-  def compute_pull(self, row, col):
-    # squared_distance_matrix[i][j] is the squared distance from (i, j) to (row, col)
-    squared_distance_matrix = np.square(self.row_numbers - row) + np.square(self.col_numbers - col)
-    # This value would otherwise have been 0 and would therefore have caused an exception when taking the reciprocal
-    squared_distance_matrix[row][col] = 0.1e-30
-    # After taking the reciprocal it correctly indicates the pull added at at (i, j) by having a stone at (row, col)
-    return np.reciprocal(squared_distance_matrix)
-
   def __update_scores(self, move_row, move_col):
-    # Add pull from new stone to current pull
-    self.pull[self.current_player] = self.pull[self.current_player] + self.compute_pull(move_row, move_col)
-    # Update each point in the grid to be owned by the player with the highest pull
-    self.score_grid = np.argmax(self.pull, axis=0) + 1
+    # note: score ignores stones, because each player has the same number of stones
+    for row in range(self.grid_size):
+      for col in range(self.grid_size):
+        # avoid division by 0
+        if (row == move_row and col == move_col):
+          continue
+        # update current player's pull
+        d = self.__compute_distance(row, col, move_row, move_col)
+        self.pull[self.current_player][row][col] += float(float(1) / (d*d))
 
-    # For each player set the score to be the sum of owned squares on the grid
-    for i in range(self.num_players):
-      self.scores[i] = np.sum(self.score_grid == (i+1))
+        old_occupier = self.score_grid[row][col]
+        # if the cell has not been claimed by any player
+        if old_occupier == 0:
+          self.score_grid[row][col] = self.current_player + 1
+          self.scores[self.current_player] += 1
+        # if the cell is claimed by some other player
+        elif old_occupier - 1 != self.current_player:
+          # and current player now has a greater pull
+          if self.pull[self.current_player][row][col] > self.pull[old_occupier - 1][row][col]:
+            self.score_grid[row][col] = self.current_player + 1
+            self.scores[old_occupier - 1] -= 1
+            self.scores[self.current_player] += 1
 
   def __declare_winner(self):
     max_score = -1

@@ -82,6 +82,20 @@
     margin-right: 15px;
   }
 
+  #player-info .player-time {
+    padding-left: 36px;
+  }
+
+  #time-taken {
+    padding-top: 100px;
+  }
+
+  #clock {
+    font-size: 54px;
+    margin: 0;
+    padding: 46px 0 0 96px;
+  }
+
   #canvas {
     vertical-align: top;
     display: inline-block;
@@ -99,6 +113,10 @@
       <div id="info-container">
         <h3>Players</h3>
         <div id="player-info"></div>
+        <div id="time-taken">
+          <h3>Current Move Time</h3>
+          <p id="clock">0.00</p>
+        </div>
       </div>
       <canvas id="canvas" width="1000" height="1000">
         Your browser does not support the HTML5 canvas tag.
@@ -123,6 +141,9 @@
           [128,128,0], [0,128,128]];
 
       var moves = [];
+
+      var clockInterval;
+      var clockStart;
 
       function drawStones(boardData) {
         var board = boardData.split(" ");
@@ -219,6 +240,7 @@
         var nameSpan = document.createElement('span');
         var colorSpan = document.createElement('span');
         var scoreSpan = document.createElement('span');
+        var timeSpan = document.createElement('span');
 
         infoComponent.setAttribute('player-id', index.toString());
         nameSpan.classList.add('player-name');
@@ -227,12 +249,28 @@
         colorSpan.style.background = colors[index];
         scoreSpan.classList.add('player-score');
         scoreSpan.textContent = '0';
-        
+        timeSpan.classList.add('player-time');
+        timeSpan.textContent = '120s';
+
         infoComponent.appendChild(colorSpan);
         infoComponent.appendChild(nameSpan);
         infoComponent.appendChild(scoreSpan);
+        infoComponent.appendChild(timeSpan);
 
         return infoComponent;
+      }
+
+      function resetClock(shouldClearInterval = false) {
+        if (shouldClearInterval) {
+          clearInterval(clockInterval);
+        }
+        document.querySelector('#clock').textContent = '0.00';
+        clockStart = new Date().getTime();
+        clockInterval = setInterval(() => {
+          let timeTaken = new Date().getTime() - clockStart;
+          timeTaken /= 1000;
+          document.querySelector('#clock').textContent = timeTaken.toFixed(2);
+        }, 100);
       }
 
       function init(names) {
@@ -241,17 +279,19 @@
         for (var i = 0; i < nameArr.length; i++) {
           infoDiv.appendChild(getInfoComponent(nameArr[i], i));
         }
+        resetClock(false);
       }
 
-      function updateScores(boardData) {
-        console.log(typeof(boardData));
+      function updatePlayers(boardData) {
         var board = boardData.split(" ");
         var numberOfPlayers = parseInt([board[board.length - 4]]);
-        var scores = board.slice(board.length - 4 - numberOfPlayers, board.length - 4).map(x => parseInt(x));
+        var scores = board.slice(board.length - 4 - numberOfPlayers, board.length - 4);
+        var times = board.slice(board.length - 4 - 2 * numberOfPlayers, board.length - 4 - numberOfPlayers);
         var playerInfo = document.querySelectorAll('#player-info p');
         playerInfo.forEach(function(info) {
           var i = parseInt(info.getAttribute('player-id'));
-          info.querySelector('.player-score').textContent = scores[i].toString();
+          info.querySelector('.player-score').textContent = scores[i];
+          info.querySelector('.player-time').textContent = times[i] + 's';
         });
       }
 
@@ -280,7 +320,8 @@
               // Drawing data
               drawBoard(buffer);
               drawStones(buffer);
-              updateScores(buffer);
+              updatePlayers(buffer);
+              resetClock(true);
             }
             // Reset buffer for next message
             buffer = '';

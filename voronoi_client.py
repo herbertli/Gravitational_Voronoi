@@ -16,14 +16,14 @@ class Client:
     self.num_players, self.num_stone, self.player_number = map(int, self.__receive_move())
     self.grid = [[0] * self.grid_size for i in range(self.grid_size)]
     self.moves = [] # store history of moves
-    
+
     # send name to serer
     self.__send(self.name)
     print("Client initialized")
 
   def __receive(self):
     return self.sock.recv(2048).decode('utf-8')
-  
+
   def __send(self, string):
     self.sock.sendall(string.encode('utf-8'))
 
@@ -52,9 +52,9 @@ class Client:
       move_col = random.randint(0, 999)
       if (self.__is_valid_move(move_row, move_col)):
         break
-    
+
     return move_row, move_col
-  
+
   def start(self):
     while True:
       move_data = self.__receive_move()
@@ -73,7 +73,7 @@ class Client:
       # sanity check
       if num_new_moves * 3 != len(new_moves):
         print("Error: error parsing list of new moves")
-      
+
       # insert new moves into the grid
       for i in range(num_new_moves):
         move_row = int(new_moves[3 * i])
@@ -91,7 +91,7 @@ class Client:
       self.moves.append((my_move_row, my_move_col, self.player_number))
       self.__send_move(my_move_row, my_move_col)
       print("Played at row {}, col {}".format(my_move_row, my_move_col))
-    
+
     self.sock.close()
 
 if (__name__ == "__main__"):

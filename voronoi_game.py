@@ -85,6 +85,7 @@ class VoronoiGame:
   def __send_update_to_node(self, move_row, move_col):
     data = self.__generate_compressed_game_bitmap()
     # Add rest of meta data
+    data += ' '.join(map(lambda x : '{0:.2f}'.format(x), self.player_times)) + ' '
     data += ' '.join(map(str, self.scores)) + ' '
     data += '{} {} '.format(self.num_players, self.current_player + 1)
     data += '{} {}'.format(move_row, move_col)

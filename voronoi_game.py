@@ -177,7 +177,7 @@ class VoronoiGame:
               self.score_grid[row][col] = self.current_player + 1
               self.scores[old_occupier - 1] -= 1
               self.scores[self.current_player] += 1
-    
+
     print("This move broke {} ties and created {} new ties\n".format(tie_broken, tie_created))
 
   def __declare_winner(self):
@@ -249,6 +249,8 @@ class VoronoiGame:
       # switch player
       self.current_player += 1
 
+    if self.use_graphic:
+        self.graphic_socket.sendall('game over\n'.encode('utf-8'))
     self.__declare_winner()
     print("\nGame over")
 

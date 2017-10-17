@@ -96,6 +96,12 @@
     padding: 46px 0 0 96px;
   }
 
+  #game-over {
+    padding-top: 100px;
+    font-size: 50px;
+    padding-left: 20px;
+  }
+
   #canvas {
     vertical-align: top;
     display: inline-block;
@@ -117,6 +123,7 @@
           <h3>Current Move Time</h3>
           <p id="clock">0.00</p>
         </div>
+        <div id="game-over"></div>
       </div>
       <canvas id="canvas" width="1000" height="1000">
         Your browser does not support the HTML5 canvas tag.
@@ -300,6 +307,13 @@
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         moves = [];
         document.getElementById('player-info').innerHTML = "";
+        document.querySelector('#game-over').textContent = "";
+      }
+
+      function endGame() {
+        clearInterval(clockInterval);
+        document.querySelector('#clock').textContent = '0.00';
+        document.querySelector('#game-over').textContent = 'Game Over';
       }
 
       var buffer = '';
@@ -316,6 +330,8 @@
             } else if (!initiated) {
               init(buffer);
               initiated = true;
+            } else if (buffer === 'game over') {
+              endGame();
             } else {
               // Drawing data
               drawBoard(buffer);

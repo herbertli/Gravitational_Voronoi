@@ -21,27 +21,17 @@
     margin: auto;
     text-align: center;
     border-bottom: 1px solid #464646;
-    position: fixed;
   }
 
   #container {
-    font-size: 0;
-    position: fixed;
-    top: 80px;
-    bottom: 40px;
-    left: 0;
-    right: 0;
-    width: 1154px;
-    height: 703px;
-    margin: auto;
+    display: flex;
+    margin-top: 80px;
+    justify-content: center;
   }
 
   #info-container {
-    vertical-align: top;
-    display: inline-block;
-    width: 350px;
-    margin-right: 100px;
     font-size: 20px;
+    margin-right: 50px;
   }
 
   #info-container h3 {
@@ -54,37 +44,23 @@
     height: 40px;
   }
 
-  #player-info p {
+  #player-info .player-info-container {
     font-weight: bold;
     letter-spacing: 1px;
     border-bottom: 1px solid #666666;
-    margin: 0;
-    padding: 0;
     height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  #player-info p span {
-    vertical-align: top;
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-    height: 60px;
-    line-height: 60px;
+  #player-info .player-info-container div {
+    margin: 0 10px;
   }
 
   #player-info .player-color {
-    margin: 16px 20px 16px 0;
     height: 28px;
     width: 28px;
-  }
-
-  #player-info .player-score {
-    float: right;
-    margin-right: 15px;
-  }
-
-  #player-info .player-time {
-    padding-left: 36px;
   }
 
   #time-taken {
@@ -93,19 +69,17 @@
 
   #clock {
     font-size: 54px;
-    margin: 0;
-    padding: 46px 0 0 96px;
+    text-align: center;
+    padding-top: 30px;
   }
 
   #game-over {
-    padding-top: 100px;
     font-size: 50px;
-    padding-left: 20px;
+    text-align: center;
+    padding-top: 50px;
   }
 
   #canvas {
-    vertical-align: top;
-    display: inline-block;
     border: 1px solid #464646;
     height: 700px;
     width: 700px;
@@ -122,7 +96,7 @@
         <div id="player-info"></div>
         <div id="time-taken">
           <h3>Current Move Time</h3>
-          <p id="clock">0.00</p>
+          <div id="clock">0.00</div>
         </div>
         <div id="game-over"></div>
       </div>
@@ -244,26 +218,27 @@
       }
 
       function getInfoComponent(name, index) {
-        var infoComponent = document.createElement('p');
-        var nameSpan = document.createElement('span');
-        var colorSpan = document.createElement('span');
-        var scoreSpan = document.createElement('span');
-        var timeSpan = document.createElement('span');
+        var infoComponent = document.createElement('div');
+        var nameComponent = document.createElement('div');
+        var colorComponent = document.createElement('div');
+        var scoreComponent = document.createElement('div');
+        var timeComponent = document.createElement('div');
 
+        infoComponent.classList.add('player-info-container')
         infoComponent.setAttribute('player-id', index.toString());
-        nameSpan.classList.add('player-name');
-        nameSpan.textContent = name;
-        colorSpan.classList.add('player-color');
-        colorSpan.style.background = colors[index];
-        scoreSpan.classList.add('player-score');
-        scoreSpan.textContent = '0';
-        timeSpan.classList.add('player-time');
-        timeSpan.textContent = '120s';
+        nameComponent.classList.add('player-name');
+        nameComponent.textContent = name;
+        colorComponent.classList.add('player-color');
+        colorComponent.style.background = colors[index];
+        scoreComponent.classList.add('player-score');
+        scoreComponent.textContent = '0';
+        timeComponent.classList.add('player-time');
+        timeComponent.textContent = '120s';
 
-        infoComponent.appendChild(colorSpan);
-        infoComponent.appendChild(nameSpan);
-        infoComponent.appendChild(scoreSpan);
-        infoComponent.appendChild(timeSpan);
+        infoComponent.appendChild(colorComponent);
+        infoComponent.appendChild(nameComponent);
+        infoComponent.appendChild(timeComponent);
+        infoComponent.appendChild(scoreComponent);
 
         return infoComponent;
       }
@@ -295,7 +270,7 @@
         var numberOfPlayers = parseInt([board[board.length - 4]]);
         var scores = board.slice(board.length - 4 - numberOfPlayers, board.length - 4);
         var times = board.slice(board.length - 4 - 2 * numberOfPlayers, board.length - 4 - numberOfPlayers);
-        var playerInfo = document.querySelectorAll('#player-info p');
+        var playerInfo = document.querySelectorAll('#player-info .player-info-container');
         playerInfo.forEach(function(info) {
           var i = parseInt(info.getAttribute('player-id'));
           info.querySelector('.player-score').textContent = scores[i];

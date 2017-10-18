@@ -209,7 +209,7 @@ class VoronoiGame:
   def start(self):
     self.server.establish_connection(self.num_players, self.num_stones)
     if self.use_graphic:
-      graphic_init_msg = ' '.join(self.server.names) + '\n'
+      graphic_init_msg = '"NAME_SEPARATOR"'.join(self.server.names) + '\n'
       self.graphic_socket.sendall(graphic_init_msg.encode('utf-8'))
     print('\nStarting...\n')
 

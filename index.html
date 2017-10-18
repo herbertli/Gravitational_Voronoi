@@ -257,7 +257,7 @@
       }
 
       function init(names) {
-        var nameArr = names.split(" ");
+        var nameArr = names.split('"NAME_SEPARATOR"');
         var infoDiv = document.getElementById('player-info');
         for (var i = 0; i < nameArr.length; i++) {
           infoDiv.appendChild(getInfoComponent(nameArr[i], i));

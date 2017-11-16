@@ -115,6 +115,7 @@
       var ctx = canvas.getContext('2d');
       var initiated = false;
       var totalScores = [];
+      var lastScores = [];
 
       var colors = ['red', 'blue', 'green', 'orange', 'yellow', 'purple',
           'silver', 'olive', 'teal'];
@@ -296,6 +297,7 @@
           info.querySelector('.total-player-score').textContent = `${percentageScore}%`;
           info.querySelector('.player-time').textContent = times[i] + 's';
         });
+        lastScores = scores.map(function(singleScore) {return parseInt(singleScore, 10)});
       }
 
       function resetBoard() {
@@ -310,6 +312,9 @@
         clearInterval(clockInterval);
         document.querySelector('#clock').textContent = '0.00';
         document.querySelector('#game-over').textContent = 'Game Over';
+        totalScores = totalScores.map(function(singleScore, i) {
+          return singleScore + lastScores[i];
+        });
       }
 
       var buffer = '';

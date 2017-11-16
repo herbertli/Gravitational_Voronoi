@@ -114,6 +114,7 @@
       var boardSize = canvasWidth;
       var ctx = canvas.getContext('2d');
       var initiated = false;
+      var totalScores = [];
 
       var colors = ['red', 'blue', 'green', 'orange', 'yellow', 'purple',
           'silver', 'olive', 'teal'];
@@ -222,6 +223,7 @@
         var nameComponent = document.createElement('div');
         var colorComponent = document.createElement('div');
         var scoreComponent = document.createElement('div');
+        var totalScoreComponent = document.createElement('div');
         var timeComponent = document.createElement('div');
 
         infoComponent.classList.add('player-info-container')
@@ -232,6 +234,8 @@
         colorComponent.style.background = colors[index];
         scoreComponent.classList.add('player-score');
         scoreComponent.textContent = '0';
+        totalScoreComponent.classList.add('total-player-score');
+        totalScoreComponent.textContent = '0';
         timeComponent.classList.add('player-time');
         timeComponent.textContent = '120s';
 
@@ -239,6 +243,7 @@
         infoComponent.appendChild(nameComponent);
         infoComponent.appendChild(timeComponent);
         infoComponent.appendChild(scoreComponent);
+        infoComponent.appendChild(totalScoreComponent);
 
         return infoComponent;
       }
@@ -261,6 +266,7 @@
         var infoDiv = document.getElementById('player-info');
         for (var i = 0; i < nameArr.length; i++) {
           infoDiv.appendChild(getInfoComponent(nameArr[i], i));
+          totalScores.push(0);
         }
         resetClock(false);
       }
@@ -271,9 +277,23 @@
         var scores = board.slice(board.length - 4 - numberOfPlayers, board.length - 4);
         var times = board.slice(board.length - 4 - 2 * numberOfPlayers, board.length - 4 - numberOfPlayers);
         var playerInfo = document.querySelectorAll('#player-info .player-info-container');
+        var totalRoundScore = 0;
+        scores.forEach(function(singleScore) {
+          totalRoundScore += parseInt(singleScore, 10);
+        });
+        var tempTotalScores = totalScores.map(function(singleScore, i) {
+          return singleScore + parseInt(scores[i], 10);
+        });
+        var totalScore = 0;
+        tempTotalScores.forEach(function(singleScore) {
+          totalScore += singleScore;
+        });
         playerInfo.forEach(function(info) {
           var i = parseInt(info.getAttribute('player-id'));
-          info.querySelector('.player-score').textContent = scores[i];
+          var percentageRoundScore = (100 * parseInt(scores[i], 10) / totalRoundScore).toFixed(1);
+          var percentageScore = (100 * tempTotalScores[i] / totalScore).toFixed(1);
+          info.querySelector('.player-score').textContent = `${percentageRoundScore}%`;
+          info.querySelector('.total-player-score').textContent = `${percentageScore}%`;
           info.querySelector('.player-time').textContent = times[i] + 's';
         });
       }

@@ -88,3 +88,12 @@ python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> 
 ```
 
 Every time you start a new server the board will reset on your display.
+
+### Saving boards from display
+If you wish to save the boards (artworks) from the games you play you simply do exactly the same as above except you add a command ling argument 1 as follows:
+
+```
+node web.js 1
+```
+
+and all the boards will be saved as PNG files in a folder which will be created if it doesn't already exist called artworks in the root of this project.

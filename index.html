@@ -315,6 +315,10 @@
         totalScores = totalScores.map(function(singleScore, i) {
           return singleScore + lastScores[i];
         });
+        var oReq = new XMLHttpRequest();
+        oReq.open('POST', '/artwork');
+        oReq.setRequestHeader('Content-Type', 'text/plain');
+        oReq.send(canvas.toDataURL());
       }
 
       var buffer = '';

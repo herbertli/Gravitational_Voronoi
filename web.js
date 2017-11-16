@@ -1,13 +1,42 @@
 var http = require('http');
 var fs = require('fs');
 
+const recordArtworks = process.argv.length > 2 && process.argv[2] === '1';
+if (recordArtworks) {
+  try {
+    fs.mkdirSync('artworks');
+  } catch (e) {
+    if (e.code !== 'EEXIST') {
+      throw e;
+    }
+  }
+}
+
 var webserver = http.createServer(function (request, response)
 {
-  fs.readFile('index.html', 'utf-8', function (error, data)
-  {
-    response.writeHead(200, {'Content-Type': 'text/html'})
-    response.end(data);
-  });
+  if (request.method === 'POST' && request.url === '/artwork') {
+    let buffers = [];
+    request.on('data', function(chunk) {
+      buffers.push(chunk);
+    });
+
+    request.on('end', function() {
+      if (recordArtworks) {
+        const name = new Date().toString();
+        const base64String = Buffer.concat(buffers).toString('utf8').replace(/data:image\/png;base64,/, '');
+        fs.writeFile(`artworks/${name}.png`, new Buffer(base64String, 'base64'), (e) => console.error);
+      }
+      response.writeHead(200);
+      response.end();
+    })
+  }
+  else {
+    fs.readFile('index.html', 'utf-8', function (error, data)
+    {
+      response.writeHead(200, {'Content-Type': 'text/html'})
+      response.end(data);
+    });
+  }
 }).listen(10000);
 
 var io = require('socket.io')(webserver);

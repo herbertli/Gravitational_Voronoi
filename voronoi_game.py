@@ -33,6 +33,19 @@ class VoronoiGame:
       self.graphic_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.graphic_socket.connect(('localhost', 8080))
 
+  def __reset(self):
+    # reset game after a round
+    self.grid = [[0] * self.grid_size for i in range(self.grid_size)]
+    self.score_grid = [[0] * self.grid_size for i in range(self.grid_size)]
+    self.scores = [0] * num_players
+    self.player_times = [120.0] * num_players
+    self.moves = []
+    self.pull = []
+    for i in range(num_players):
+      self.pull.append([[0] * self.grid_size for j in range(self.grid_size)])
+    self.moves_made = 0
+    self.game_over = False
+
   def __get_game_info(self):
     # game over flag
     game_info = ("1" if self.game_over else "0") + " "
@@ -213,46 +226,49 @@ class VoronoiGame:
       self.graphic_socket.sendall(graphic_init_msg.encode('utf-8'))
     print('\nStarting...\n')
 
-    while True:
-      self.current_player = self.current_player % self.num_players
-      self.__broadcast_game_info()
-      if (self.game_over):
-        break
+    for p in range(self.num_players):
+      self.__reset()
+      self.current_player = p
+      while True:
+        self.current_player = self.current_player % self.num_players
+        self.__broadcast_game_info()
+        if (self.game_over):
+          break
 
-      # get and validate move
-      move_row, move_col = self.__get_player_move()
-      print("{} has placed their stone on: {}, {}".format(self.server.names[self.current_player] , move_row, move_col))
-      if not self.__is_legal_move(move_row, move_col):
-        self.scores[self.current_player] = -1
-        self.game_over = True
-        continue
+        # get and validate move
+        move_row, move_col = self.__get_player_move()
+        print("{} has placed their stone on: {}, {}".format(self.server.names[self.current_player] , move_row, move_col))
+        if not self.__is_legal_move(move_row, move_col):
+          self.scores[self.current_player] = -1
+          self.game_over = True
+          continue
 
-      # move is legal, do some book-keeping
-      self.moves_made += 1
-      self.grid[move_row][move_col] = self.current_player + 1
-      self.moves.append(move_row)
-      self.moves.append(move_col)
-      self.moves.append(self.current_player + 1)
-      self.__update_scores(move_row, move_col)
+        # move is legal, do some book-keeping
+        self.moves_made += 1
+        self.grid[move_row][move_col] = self.current_player + 1
+        self.moves.append(move_row)
+        self.moves.append(move_col)
+        self.moves.append(self.current_player + 1)
+        self.__update_scores(move_row, move_col)
 
-      # send data to node server
+        # send data to node server
+        if self.use_graphic:
+          self.__send_update_to_node(move_row, move_col)
+
+        # check for game over conditions
+        if self.player_times[self.current_player] < 0:
+          self.scores[self.current_player] = -2
+          self.game_over = True
+        if self.moves_made == self.num_players * self.num_stones:
+          self.game_over = True
+
+        # switch player
+        self.current_player += 1
+
       if self.use_graphic:
-        self.__send_update_to_node(move_row, move_col)
-
-      # check for game over conditions
-      if self.player_times[self.current_player] < 0:
-        self.scores[self.current_player] = -2
-        self.game_over = True
-      if self.moves_made == self.num_players * self.num_stones:
-        self.game_over = True
-
-      # switch player
-      self.current_player += 1
-
-    if self.use_graphic:
-        self.graphic_socket.sendall('game over\n'.encode('utf-8'))
-    self.__declare_winner()
-    print("\nGame over")
+          self.graphic_socket.sendall('game over\n'.encode('utf-8'))
+      self.__declare_winner()
+      print("\nGame over")
 
 if __name__ == "__main__":
   GRID_SIZE = 1000
@@ -263,7 +279,7 @@ if __name__ == "__main__":
   port = int(sys.argv[4])
   use_graphic = False
   if len(sys.argv) == 6 and int(sys.argv[5]) == 1:
-      use_graphic = True
+    use_graphic = True
 
   game = VoronoiGame(num_stones, num_players, GRID_SIZE, MIN_DIST, host, port, use_graphic)
   game.start()

@@ -106,6 +106,9 @@ class VoronoiGame:
 
     self.graphic_socket.sendall(data.encode('utf-8'))
 
+  def __soft_reset_node(self):
+    self.graphic_socket.sendall('soft-reset\n'.encode('utf-8'))
+
   def __compute_distance(self, row1, col1, row2, col2):
     return math.sqrt((row2 - row1)**2 + (col2 - col1)**2)
 
@@ -227,7 +230,6 @@ class VoronoiGame:
     print('\nStarting...\n')
 
     for p in range(self.num_players):
-      self.__reset()
       self.current_player = p
       while True:
         self.current_player = self.current_player % self.num_players
@@ -269,6 +271,12 @@ class VoronoiGame:
           self.graphic_socket.sendall('game over\n'.encode('utf-8'))
       self.__declare_winner()
       print("\nGame over")
+
+      # do reset unless it's the last game
+      if p != num_players - 1:
+        time.sleep(2) # pause for 2 seconds in between games
+        self.__reset()
+        self.__soft_reset_node();
 
 if __name__ == "__main__":
   GRID_SIZE = 1000

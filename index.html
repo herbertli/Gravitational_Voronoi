@@ -300,6 +300,11 @@
         lastScores = scores.map(function(singleScore) {return parseInt(singleScore, 10)});
       }
 
+      function softReset() {
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        moves = [];
+      }
+
       function resetBoard() {
         initiated = false;
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -330,11 +335,13 @@
             // We know it's the end of the message
             // Remove the newline character
             buffer = buffer.slice(0, -1);
-            if (buffer == 'reset') {
+            if (buffer === 'reset') {
               resetBoard();
             } else if (!initiated) {
               init(buffer);
               initiated = true;
+            } else if (buffer === 'soft-reset') {
+              softReset();
             } else if (buffer === 'game over') {
               endGame();
             } else {

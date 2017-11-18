@@ -18,7 +18,9 @@ The server calculates the area of influence of each player discretely on a 1000 
 
 ## The client
 
-In our implementation, there is no flag that indicates which client is the first (or second) player. Rather, player order is determined by the order in which each client connects to the server, i.e., the first client that connects to the server becomes the first player of the game.
+In our implementation, there is no flag that indicates which client is the first (or second, etc.) player. Rather, player order is determined by the order in which each client connects to the server, i.e., the first client that connects to the server becomes the first player of the game. However, the play order (1-indexed) for each client will be sent upon successful connection.
+
+In addition, player rotation after each game is built in, so that each player would play exactly one game as the first one to move. More details on how this works are included below.
 
 A sample client in Python 3 is provided. To run the sample client, execute:
 
@@ -30,7 +32,7 @@ If you wish to write your own client, please follow the server-client communicat
 
 1. Connect your client to the server.
 
-2. Receive game information. After connecting your client to the server, you should receive the game information from the server in the format of `"<number-of-players> <number-of-stones>\n"`. The string is delimited by a space and ends with a new line character.
+2. Receive game information. After connecting your client to the server, you should receive the game information from the server in the format of `"<number-of-players> <number-of-stones> <player-order>\n"`. The string is delimited by a space and ends with a new line character.
 
 3. Send team name. After receiving the game information, you should send your team name to the server as a string.
 
@@ -48,6 +50,8 @@ The following represents what a general game update looks like. Note that the mo
 ```
 
 5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. The move should simply be a string `"<move_row> <move_col>"` - row and column of the move separated by a space.
+
+A special note on the player rotation protocol - although multiple games are played during one competition (number of games equals number of players), the client needs to complete step `1-3` once only. Moreover, the server does not explicitly indicate the start of a new game. Instead, the client should check if the most recent update has the `game-over-flag` set, and if so, the client should treat all future updates as updates for a new game. It might be helpful to take a look at how the sample client handles rotation if the description is not clear enough.
 
 ## Running the game without display
 

@@ -303,12 +303,15 @@
       function softReset() {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         moves = [];
+        document.querySelector('#game-over').textContent = "";
       }
 
       function resetBoard() {
         initiated = false;
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         moves = [];
+        totalScores = [];
+        lastScores = [];
         document.getElementById('player-info').innerHTML = "";
         document.querySelector('#game-over').textContent = "";
       }

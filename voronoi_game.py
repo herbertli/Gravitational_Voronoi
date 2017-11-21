@@ -241,8 +241,7 @@ class VoronoiGame:
         move_row, move_col = self.__get_player_move()
         print("{} has placed their stone on: {}, {}".format(self.server.names[self.current_player] , move_row, move_col))
         if not self.__is_legal_move(move_row, move_col):
-          self.scores[self.current_player] = -1
-          self.game_over = True
+          print("Move is illegal, skipping the current player")
           continue
 
         # move is legal, do some book-keeping

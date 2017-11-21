@@ -276,7 +276,8 @@ class VoronoiGame:
       if p != num_players - 1:
         time.sleep(2) # pause for 2 seconds in between games
         self.__reset()
-        self.__soft_reset_node();
+        if (use_graphic):
+          self.__soft_reset_node()
 
 if __name__ == "__main__":
   GRID_SIZE = 1000

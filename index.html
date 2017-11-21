@@ -330,32 +330,33 @@
       }
 
       var buffer = '';
-
+      var messages = [];
       socket.on('to_client', function(data)
         {
           buffer += data;
           if (buffer[buffer.length - 1] == '\n') {
-            // We know it's the end of the message
-            // Remove the newline character
-            buffer = buffer.slice(0, -1);
-            if (buffer === 'reset') {
-              resetBoard();
-            } else if (!initiated) {
-              init(buffer);
-              initiated = true;
-            } else if (buffer === 'soft-reset') {
-              softReset();
-            } else if (buffer === 'game over') {
-              endGame();
-            } else {
-              // Drawing data
-              drawBoard(buffer);
-              drawStones(buffer);
-              updatePlayers(buffer);
-              resetClock(true);
-            }
+            messages = messages.concat(buffer.split('\n')).filter(x => x);
+            messages.forEach(curMsg => {
+              if (curMsg === 'reset') {
+                resetBoard();
+              } else if (!initiated) {
+                init(curMsg);
+                initiated = true;
+              } else if (curMsg === 'soft-reset') {
+                softReset();
+              } else if (curMsg === 'game over') {
+                endGame();
+              } else {
+                // Drawing data
+                drawBoard(curMsg);
+                drawStones(curMsg);
+                updatePlayers(curMsg);
+                resetClock(true);
+              }
+            });
             // Reset buffer for next message
             buffer = '';
+            messages = [];
           }
         });
     </script>

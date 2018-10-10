@@ -61,11 +61,10 @@ class VoronoiGame:
         game_info["scores"] = self.scores
         # new moves - go through move history in reverse order and stop when a move by current player is found
         new_moves = []
-        for i in range(len(self.moves) - 1, 1, -3):
-            if (self.moves[i] == self.current_player + 1):
+        for i in range(len(self.moves) - 1, 1, -1):
+            if (self.moves[i][2] == self.current_player + 1):
                 break
-            for j in range(3):
-                new_moves.append(self.moves[i - 2 + j])
+            new_moves.append(self.moves[i])
         game_info["moves"] = new_moves
         return game_info
 
@@ -137,9 +136,9 @@ class VoronoiGame:
             print("({}, {}) is out of bounds".format(row, col))
             return False
         # check for min dist requirement
-        for move_start in range(0, len(self.moves), 3):
-            move_row = self.moves[move_start]
-            move_col = self.moves[move_start + 1]
+        for move_start in range(0, len(self.moves)):
+            move_row = self.moves[move_start][0]
+            move_col = self.moves[move_start][1]
             if (self.__compute_distance(row, col, move_row, move_col) < self.min_dist):
                 print("({}, {}) is less than 66 unit distances away from ({}, {})".format(
                     row, col, move_row, move_col))
@@ -266,9 +265,8 @@ class VoronoiGame:
                 # move is legal, do some book-keeping
                 self.moves_made += 1
                 self.grid[move_row][move_col] = self.current_player + 1
-                self.moves.append(move_row)
-                self.moves.append(move_col)
-                self.moves.append(self.current_player + 1)
+                self.moves.append(
+                    [move_row, move_col, self.current_player + 1])
                 self.__update_scores(move_row, move_col)
 
                 # send data to node server

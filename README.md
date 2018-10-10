@@ -18,7 +18,7 @@ The server calculates the area of influence of each player discretely on a 1000 
 
 ## The client
 
-In our implementation, there is no flag that indicates which client is the first (or second, etc.) player. Rather, player order is determined by the order in which each client connects to the server, i.e., the first client that connects to the server becomes the first player of the game. However, the play order (1-indexed) for each client will be sent upon successful connection.
+In our implementation, player order is determined by the order in which each client connects to the server, i.e., the first client that connects to the server becomes the first player of the game. However, the play order (1-indexed) for each client will be sent upon successful connection.
 
 In addition, player rotation after each game is built in, so that each player would play exactly one game as the first one to move. More details on how this works are included below.
 
@@ -37,12 +37,12 @@ If you wish to write your own client, please follow the server-client communicat
 {
     "num_players": 2,
     "num_stones": 10,
-    "player_number": 0
+    "player_number": 1
 }
 ```
 Player_number is your id that is assigned to you by the server.
 
-3. Send team name in the following JSON format:
+3. Send your team name in the following JSON format:
 ```
 {
     "player_name": "Botty McBotFace"
@@ -54,12 +54,12 @@ Player_number is your id that is assigned to you by the server.
 {
     "game_over": false,
     "scores": [35.0, 65.0],
-    "moves": [1, 1, 0, 100]
+    "moves": [[1, 1, 0], [100, 100, 1], [1, 1, 2]]
 }
 ```
    1. Game over flag
    2. Scores. Say there are N players. Then there will be an array of N numbers, representing the score from player 1 to player N.
-   3. New moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played.
+   3. Moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played.
 
 5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. The move should simply be a JSON object:
 ```
@@ -69,7 +69,9 @@ Player_number is your id that is assigned to you by the server.
 }
 ```
 
-A special note on the player rotation protocol - although multiple games are played during one competition (number of games equals number of players), the client needs to complete step `1-3` once only. Moreover, the server does not explicitly indicate the start of a new game. Instead, the client should check if the most recent update has the `game_over == true`, and if so, the client should treat all future updates as updates for a new game. It might be helpful to take a look at how the sample client handles rotation if the description is not clear enough.
+A special note on the player rotation protocol - although multiple games are played during one competition (number of games equals number of players), the client needs to complete step `1-3` once only. 
+
+The client should check if the most recent update has the `game_over == true`, and if so, the client should treat all future updates as updates for a new game. It might be helpful to take a look at how the sample client handles rotation if the description is not clear enough.
 
 ## Running the game without display
 
@@ -85,7 +87,7 @@ and run each client with (if you are using the client provided here):
 python3 voronoi_client.py <server-ip> <port> <team-name>
 ```
 
-Finally, press `<Enter>` in the server terminal to start the game.
+Finally, press `<Enter>` in the server terminal to start the game when prompted.
 
 ## Running the game with display
 

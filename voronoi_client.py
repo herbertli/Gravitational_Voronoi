@@ -89,27 +89,23 @@ class Client:
                 scores = game_state["scores"]
                 # new moves
                 new_moves = game_state["moves"]
-                num_new_moves = int(len(new_moves) / 3)
-                # sanity check
-                if num_new_moves * 3 != len(new_moves):
-                    print("Error: error parsing list of new moves")
 
                 # insert new moves into the grid
-                for i in range(num_new_moves):
-                    move_row = int(new_moves[3 * i])
-                    move_col = int(new_moves[3 * i + 1])
-                    player = int(new_moves[3 * i + 2])
+                for i in range(len(new_moves)):
+                    move_row = int(new_moves[i][0])
+                    move_col = int(new_moves[i][1])
+                    player = int(new_moves[i][2])
                     # sanity check, this should always be true
                     if player > 0:
                         self.grid[move_row][move_col] = player
-                        self.moves.append((move_row, move_col, player))
+                        self.moves.append([move_row, move_col, player])
                     else:
                         print("Error: player info incorrect")
 
                 # make move
                 my_move_row, my_move_col = self.__getMove()
                 self.moves.append(
-                    (my_move_row, my_move_col, self.player_number))
+                    [my_move_row, my_move_col, self.player_number])
                 self.__send_move(my_move_row, my_move_col)
                 print("Played at row {}, col {}".format(
                     my_move_row, my_move_col))

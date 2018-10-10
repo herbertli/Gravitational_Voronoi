@@ -1,45 +1,14 @@
-var http = require('http');
-var fs = require('fs');
+var path = require('path');
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
-const recordArtworks = process.argv.length > 2 && process.argv[2] === '1';
-if (recordArtworks) {
-  try {
-    fs.mkdirSync('artworks');
-  } catch (e) {
-    if (e.code !== 'EEXIST') {
-      throw e;
-    }
-  }
-}
+app.use(express.static(path.join(__dirname, 'public')));
 
-var webserver = http.createServer(function (request, response) {
-  if (request.method === 'POST' && request.url === '/artwork') {
-    let buffers = [];
-    request.on('data', function (chunk) {
-      buffers.push(chunk);
-    });
-
-    request.on('end', function () {
-      if (recordArtworks) {
-        const name = new Date().toString();
-        const base64String = Buffer.concat(buffers).toString('utf8').replace(/data:image\/png;base64,/, '');
-        fs.writeFile(`artworks/${name}.png`, new Buffer(base64String, 'base64'), (e) => console.error);
-      }
-      response.writeHead(200);
-      response.end();
-    })
-  } else {
-    fs.readFile('index.html', 'utf-8', function (error, data) {
-      response.writeHead(200, {
-        'Content-Type': 'text/html'
-      })
-      response.end(data);
-    });
-  }
-}).listen(10000);
-
-var io = require('socket.io')(webserver);
-console.log("Webserver socket listening on 127.0.0.1:10000");
+http.listen(10000, function () {
+  console.log("Webserver socket listening on 127.0.0.1:10000");
+});
 
 // ----------------------------------------------------------------------------
 

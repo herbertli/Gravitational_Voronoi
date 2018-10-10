@@ -73,9 +73,9 @@ class VoronoiGame:
         game_info = self.__get_game_info()
         if self.game_over:
             for i in range(num_players):
-                self.server.send(json.dump(game_info), i)
+                self.server.send(game_info, i)
         else:
-            self.server.send(json.dump(game_info), self.current_player)
+            self.server.send(game_info, self.current_player)
 
     def __generate_compressed_game_bitmap(self):
         # Compression format is start_index end_index (inclusive) player_owner
@@ -116,10 +116,10 @@ class VoronoiGame:
         data["current_player"] = self.current_player + 1
         data["move_row"] = move_row
         data["move_col"] = move_col
-        self.graphic_socket.sendall(json.dump(data).encode('utf-8'))
+        self.graphic_socket.sendall(json.dumps(data).encode('utf-8'))
 
     def __soft_reset_node(self):
-        self.graphic_socket.sendall(json.dump({
+        self.graphic_socket.sendall(json.dumps({
             "soft-reset": True
         }).encode('utf-8'))
 
@@ -154,7 +154,7 @@ class VoronoiGame:
         print("They have {} seconds remaining".format(player_time))
 
         start_time = time.time()
-        client_response = json.load(self.server.receive(self.current_player))
+        client_response = self.server.receive(self.current_player)
         end_time = time.time()
         self.player_times[self.current_player] -= (end_time - start_time)
         return int(client_response["move_row"]), int(client_response["move_col"])
@@ -244,7 +244,7 @@ class VoronoiGame:
                 "player_names": self.server.names
             }
             self.graphic_socket.sendall(
-                json.dump(graphic_init_msg).encode('utf-8'))
+                json.dumps(graphic_init_msg).encode('utf-8'))
         print('\nStarting...\n')
 
         for p in range(self.num_players):
@@ -286,7 +286,7 @@ class VoronoiGame:
                 self.current_player += 1
 
             if self.use_graphic:
-                self.graphic_socket.sendall(json.dump({
+                self.graphic_socket.sendall(json.dumps({
                     "game_over": True
                 }).encode('utf-8'))
             self.__declare_winner()
@@ -296,8 +296,8 @@ class VoronoiGame:
             if p != num_players - 1:
                 time.sleep(2)  # pause for 2 seconds in between games
                 self.__reset()
-                if (use_graphic):
-                self.__soft_reset_node()
+                if use_graphic:
+                    self.__soft_reset_node()
 
 
 if __name__ == "__main__":

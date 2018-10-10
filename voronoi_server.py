@@ -20,20 +20,21 @@ class VoronoiServer:
             print("Waiting for player " + str(i))
             self.connection[i - 1], self.address[i -
                                                  1] = self.my_socket.accept()
-            self.send(json.dump({
+            self.send({
                 "num_players": num_players,
-                "num_stones": num_stones
-            }), i - 1)
+                "num_stones": num_stones,
+                "player_number": i - 1
+            }, i - 1)
             self.names[i - 1] = self.receive(i - 1)["player_name"]
             print("Connection from Player " +
                   self.names[i - 1] + " established.")
 
-    def send(self, string, player):
-        self.connection[player].sendall(string.encode('utf-8'))
+    def send(self, obj, player):
+        self.connection[player].sendall(json.dumps(obj).encode('utf-8'))
 
     def receive(self, player):
         while True:
-            data = json.load(
+            data = json.loads(
                 self.connection[player].recv(1024).decode('utf-8'))
             if not data:
                 continue

@@ -28,9 +28,9 @@ class Client:
         self.moves = []  # store history of moves
 
         # send name to serer
-        self.__send(json.dump({
+        self.__send({
             "player_name": self.name
-        }))
+        })
         print("Client initialized")
 
     def __reset(self):
@@ -38,10 +38,10 @@ class Client:
         self.moves = []
 
     def __receive(self):
-        return json.load(self.sock.recv(2048).decode('utf-8'))
+        return json.loads(self.sock.recv(2048).decode('utf-8'))
 
     def __send(self, obj):
-        self.sock.sendall(json.dump(obj).encode('utf-8'))
+        self.sock.sendall(json.dumps(obj).encode('utf-8'))
 
     def __receive_move(self):
         return self.__receive()
@@ -79,16 +79,16 @@ class Client:
             while True:
                 move_data = self.__receive_move()
                 # check if game is over
-                if int(move_data[0]) == 1:
+                if "game_over" in move_data and move_data["game_over"]:
                     print("Game over")
                     break
 
                 # scores
                 scores = []
                 for i in range(self.num_players):
-                    scores.append(move_data[i + 1])
+                    scores.append(move_data["scores"][i])
                 # new moves
-                new_moves = move_data[self.num_players + 1:]
+                new_moves = move_data["new_moves"]
                 num_new_moves = int(len(new_moves) / 3)
                 # sanity check
                 if num_new_moves * 3 != len(new_moves):

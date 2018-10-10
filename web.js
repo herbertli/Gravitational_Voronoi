@@ -12,15 +12,14 @@ if (recordArtworks) {
   }
 }
 
-var webserver = http.createServer(function (request, response)
-{
+var webserver = http.createServer(function (request, response) {
   if (request.method === 'POST' && request.url === '/artwork') {
     let buffers = [];
-    request.on('data', function(chunk) {
+    request.on('data', function (chunk) {
       buffers.push(chunk);
     });
 
-    request.on('end', function() {
+    request.on('end', function () {
       if (recordArtworks) {
         const name = new Date().toString();
         const base64String = Buffer.concat(buffers).toString('utf8').replace(/data:image\/png;base64,/, '');
@@ -29,11 +28,11 @@ var webserver = http.createServer(function (request, response)
       response.writeHead(200);
       response.end();
     })
-  }
-  else {
-    fs.readFile('index.html', 'utf-8', function (error, data)
-    {
-      response.writeHead(200, {'Content-Type': 'text/html'})
+  } else {
+    fs.readFile('index.html', 'utf-8', function (error, data) {
+      response.writeHead(200, {
+        'Content-Type': 'text/html'
+      })
       response.end(data);
     });
   }

@@ -8,7 +8,7 @@ import json
 
 
 class VoronoiGame:
-    def __init__(self, num_stones, num_players, grid_size, min_dist=66, host="127.0.0.1", port=3000, use_graphic=False):
+    def __init__(self, num_stones: int, num_players: int, grid_size: int, min_dist: int, host: str, port: int, use_graphic: bool):
         # game variables
         self.num_stones = num_stones
         self.num_players = num_players
@@ -53,7 +53,7 @@ class VoronoiGame:
         self.moves_made = 0
         self.game_over = False
 
-    def __get_game_info(self):
+    def __get_game_state(self):
         # game over flag
         game_info = {}
         game_info["game_over"] = self.game_over
@@ -66,18 +66,18 @@ class VoronoiGame:
                 break
             for j in range(3):
                 new_moves.append(self.moves[i - 2 + j])
-        game_info["new_moves"] = new_moves
+        game_info["moves"] = new_moves
         return game_info
 
     def __broadcast_game_info(self):
-        game_info = self.__get_game_info()
+        game_info = self.__get_game_state()
         if self.game_over:
             for i in range(num_players):
                 self.server.send(game_info, i)
         else:
             self.server.send(game_info, self.current_player)
 
-    def __generate_compressed_game_bitmap(self):
+    def __generate_compressed_game_bitmap(self) -> str:
         # Compression format is start_index end_index (inclusive) player_owner
         bitmap = ''
         for score_row in self.score_grid:
@@ -92,7 +92,7 @@ class VoronoiGame:
                                       str(score_row[-1]))
         return bitmap
 
-    def __generate_decompressed_game_bitmap(self, compressed_bitmap):
+    def __generate_decompressed_game_bitmap(self, compressed_bitmap: str) -> str:
         # This was just written for testing correct (de)compression
         i = 0
         compressed_bitmap_array = compressed_bitmap.split(' ')
@@ -106,7 +106,7 @@ class VoronoiGame:
                     break
         return decompressed_bitmap
 
-    def __send_update_to_node(self, move_row, move_col):
+    def __send_update_to_node(self, move_row: int, move_col: int):
         data = {}
         data["bitmap"] = self.__generate_compressed_game_bitmap()
         # Add rest of meta data
@@ -116,17 +116,17 @@ class VoronoiGame:
         data["current_player"] = self.current_player + 1
         data["move_row"] = move_row
         data["move_col"] = move_col
-        self.graphic_socket.sendall(json.dumps(data).encode('utf-8'))
+        self.graphic_socket.sendall(json.dumps(data).encode("utf-8"))
 
     def __soft_reset_node(self):
         self.graphic_socket.sendall(json.dumps({
             "soft-reset": True
-        }).encode('utf-8'))
+        }).encode("utf-8"))
 
-    def __compute_distance(self, row1, col1, row2, col2):
+    def __compute_distance(self, row1: int, col1: int, row2: int, col2: int) -> float:
         return math.sqrt((row2 - row1)**2 + (col2 - col1)**2)
 
-    def __is_legal_move(self, row, col):
+    def __is_legal_move(self, row: int, col: int) -> bool:
         if self.grid[row][col] != 0:
             print("({}, {}) is already occupied".format(row, col))
             return False
@@ -159,7 +159,7 @@ class VoronoiGame:
         self.player_times[self.current_player] -= (end_time - start_time)
         return int(client_response["move_row"]), int(client_response["move_col"])
 
-    def __update_scores(self, move_row, move_col):
+    def __update_scores(self, move_row: int, move_col: int):
         tie_created = 0
         tie_broken = 0
         # note: score ignores stones, because each player has the same number of stones
@@ -244,7 +244,7 @@ class VoronoiGame:
                 "player_names": self.server.names
             }
             self.graphic_socket.sendall(
-                json.dumps(graphic_init_msg).encode('utf-8'))
+                json.dumps(graphic_init_msg).encode("utf-8"))
         print('\nStarting...\n')
 
         for p in range(self.num_players):
@@ -288,7 +288,7 @@ class VoronoiGame:
             if self.use_graphic:
                 self.graphic_socket.sendall(json.dumps({
                     "game_over": True
-                }).encode('utf-8'))
+                }).encode("utf-8"))
             self.__declare_winner()
             print("Game over")
 
@@ -303,6 +303,9 @@ class VoronoiGame:
 if __name__ == "__main__":
     GRID_SIZE = 1000
     MIN_DIST = 66
+    if len(sys.argv) < 5:
+        print("Usage: python3 voronoi_game.py <num_stones> <num_players> <host> <port> <use_graphics>")
+        exit(0)
     num_stones = int(sys.argv[1])
     num_players = int(sys.argv[2])
     host = sys.argv[3]

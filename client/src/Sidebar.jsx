@@ -24,13 +24,7 @@ class Sidebar extends React.Component {
     render() {
         let rows;
         if (!this.props.player_names || this.props.player_names.length === 0) {
-            rows = <TableRow key={0}>
-                <TableCell>Please</TableCell>
-                <TableCell>Join</TableCell>
-                <TableCell>The</TableCell>
-                <TableCell>Server!</TableCell>
-                <TableCell>:D</TableCell>
-            </TableRow>
+            rows = <TableRow key={0}></TableRow>
         } else {
             rows = this.props.player_names.map((name, i) => {
                 return (
@@ -39,7 +33,7 @@ class Sidebar extends React.Component {
                         <TableCell>{name}</TableCell>
                         <TableCell>{this.props.percentages[i]}</TableCell>
                         <TableCell>{this.props.last_percentage[i]}</TableCell>
-                        <TableCell>{this.props.player_times[i]}</TableCell>
+                        <TableCell>{this.props.player_times[i].toFixed(1) + "s"}</TableCell>
                     </TableRow>
                 );
             });
@@ -47,10 +41,10 @@ class Sidebar extends React.Component {
 
         return (
             <div>
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h5" gutterBottom style={{ textAlign: "center" }}>
                     Players in Lobby
                 </Typography>
-                <Table>
+                <Table padding={"dense"}>
                     <TableHead>
                         <TableRow>
                             <TableCell>#</TableCell>

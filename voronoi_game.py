@@ -281,14 +281,17 @@ class VoronoiGame:
                 # switch player
                 self.current_player += 1
 
-            # if self.use_graphic:
-                # self.__soft_reset_node()
+            if self.use_graphic:
+                self.graphic_socket.sendall(json.dumps({
+                    "game_over": True
+                }).encode("utf-8"))
             self.__declare_winner()
             print("Game over")
 
             # do reset unless it's the last game
             if p != num_players - 1:
-                time.sleep(2)  # pause for 2 seconds in between games
+                input("Press <Enter> to start next round")
+                # time.sleep(2)  # pause for 2 seconds in between games
                 self.__reset()
                 if use_graphic:
                     self.__soft_reset_node()

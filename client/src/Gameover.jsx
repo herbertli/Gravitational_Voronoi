@@ -34,8 +34,10 @@ class Gameover extends React.Component {
 
         return (
             <div>
-                <Typography variant="h5" gutterBottom>
-                    Players in Lobby
+                <Typography variant="h5" gutterBottom style={{ textAlign: "center" }}>
+                    Game Over!
+                    <br />
+                    Final Scores:
                 </Typography>
                 <Table>
                     <TableHead>

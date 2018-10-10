@@ -105,7 +105,7 @@ class VoronoiGame:
                     break
         return decompressed_bitmap
 
-    def __send_update_to_node(self, move_row: int, move_col: int):
+    def __send_update_to_node(self, move_row=False, move_col=False, soft_reset=False):
         data = {}
         data["bitmap"] = self.__generate_compressed_game_bitmap()
         # Add rest of meta data
@@ -113,14 +113,16 @@ class VoronoiGame:
         data["player_scores"] = self.scores
         data["num_players"] = self.num_players
         data["current_player"] = self.current_player + 1
-        data["move_row"] = move_row
-        data["move_col"] = move_col
+        if move_row and move_col:
+            data["move_row"] = move_row
+            data["move_col"] = move_col
+        data["player_names"] = self.server.names
+        data["game_over"] = self.game_over
+        data["soft-reset"] = soft_reset
         self.graphic_socket.sendall(json.dumps(data).encode("utf-8"))
 
     def __soft_reset_node(self):
-        self.graphic_socket.sendall(json.dumps({
-            "soft-reset": True
-        }).encode("utf-8"))
+        self.__send_update_to_node(soft_reset=True)
 
     def __compute_distance(self, row1: int, col1: int, row2: int, col2: int) -> float:
         return math.sqrt((row2 - row1)**2 + (col2 - col1)**2)
@@ -238,14 +240,9 @@ class VoronoiGame:
 
     def start(self):
         self.server.establish_connection(self.num_players, self.num_stones)
+        input("Press <Enter> to Start!")
         if self.use_graphic:
-            graphic_init_msg = {
-                "player_names": self.server.names
-            }
-            self.graphic_socket.sendall(
-                json.dumps(graphic_init_msg).encode("utf-8"))
-        print('\nStarting...\n')
-
+            self.__send_update_to_node()
         for p in range(self.num_players):
             self.current_player = p
             while True:
@@ -271,7 +268,8 @@ class VoronoiGame:
 
                 # send data to node server
                 if self.use_graphic:
-                    self.__send_update_to_node(move_row, move_col)
+                    self.__send_update_to_node(
+                        move_row=move_row, move_col=move_col)
 
                 # check for game over conditions
                 if self.player_times[self.current_player] < 0:
@@ -283,10 +281,8 @@ class VoronoiGame:
                 # switch player
                 self.current_player += 1
 
-            if self.use_graphic:
-                self.graphic_socket.sendall(json.dumps({
-                    "game_over": True
-                }).encode("utf-8"))
+            # if self.use_graphic:
+                # self.__soft_reset_node()
             self.__declare_winner()
             print("Game over")
 

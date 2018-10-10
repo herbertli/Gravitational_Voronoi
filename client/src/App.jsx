@@ -4,7 +4,6 @@ import React, {
 import './App.css';
 import Board from './Board';
 import Sidebar from './Sidebar';
-import Timer from './Timer';
 import Gameover from './Gameover';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -40,6 +39,9 @@ class App extends Component {
 
   resetBoard() {
     this.setState({
+      in_lobby: true,
+      total_scores: [],
+      last_percentage: [],
       bitmap: "",
       moves: [],
       game_over: false
@@ -47,17 +49,27 @@ class App extends Component {
   }
 
   softReset() {
+    var tempTotalScores = this.state.total_scores.map((singleScore, i) => {
+      return singleScore + parseInt(this.state.player_scores[i], 10);
+    });
     this.setState({
       moves: [],
       bitmap: "",
-      game_over: false
+      game_over: false,
+      total_scores: tempTotalScores
     });
   }
 
   endGame() {
     clearInterval(this.clockInterval);
+    var tempTotalScores = this.state.total_scores.map((singleScore, i) => {
+      return singleScore + parseInt(this.state.player_scores[i], 10);
+    });
     this.setState({
-      game_over: true
+      moves: [],
+      bitmap: "",
+      game_over: true,
+      total_scores: tempTotalScores
     });
   }
 
@@ -131,14 +143,8 @@ class App extends Component {
           percentages.push(percentageRoundScore);
         });
 
-        // calculate total score across all rounds
-        var tempTotalScores = this.state.total_scores.map((singleScore, i) => {
-          return singleScore + parseInt(this.state.player_scores[i], 10);
-        });
-
         this.setState({
-          percentages: percentages,
-          total_scores: tempTotalScores
+          percentages: percentages
         });
         this.resetClock(true);
       }
@@ -158,41 +164,36 @@ class App extends Component {
   }
 
   render() {
+    console.log("current player:", this.state.current_player);
     return (
       <div>
-        <Typography variant="h2" gutterBottom>
+        <Typography variant="h2" gutterBottom style={{ textAlign: "center" }}>
           Gravitational Voronoi
           </Typography>
-        <Grid container>
+        <Grid container spacing={32}>
           {
             this.state.game_over ? <Grid item xs={12}>
               <Gameover
                 player_names={this.state.player_names}
                 total_scores={this.state.total_scores}
               /></Grid> :
-              (<React.Fragment>
-                <Grid item xs={12}>
-                  <Sidebar
-                    player_names={this.state.player_names}
-                    player_scores={this.state.player_scores}
-                    player_times={this.state.player_times}
-                    last_percentage={this.state.last_percentage}
-                    current_player={this.state.current_player}
-                    percentages={this.state.percentages}
-                  />
-                  <br />
-                  <Timer timeTaken={this.state.timeTaken} />
-                </Grid>
-                <Grid item xs={12}>
-                  <Board
-                    height={1000}
-                    width={1000}
-                    bitmap={this.state.bitmap}
-                    moves={this.state.moves}
-                  />
-                </Grid>
-              </React.Fragment>)
+              <Grid item xs={12}>
+                <Sidebar
+                  player_names={this.state.player_names}
+                  player_scores={this.state.player_scores}
+                  player_times={this.state.player_times}
+                  last_percentage={this.state.last_percentage}
+                  current_player={this.state.current_player}
+                  percentages={this.state.percentages}
+                />
+              </Grid>
           }
+          <Grid item xs={12}>
+            <Board
+              bitmap={this.state.bitmap}
+              moves={this.state.moves}
+            />
+          </Grid>
         </Grid>
       </div>
     );

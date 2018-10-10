@@ -78,7 +78,7 @@ class Board extends React.Component {
 
     componentDidUpdate() {
         let ctx = this.canvas.current.getContext("2d");
-        if (!this.props.bitmap || this.props.bitmap === "") {
+        if (!this.props.bitmap || this.props.bitmap === "" || this.props.moves.length === 0) {
             return;
         }
         this.drawBoard(ctx, this.props.bitmap);
@@ -88,8 +88,8 @@ class Board extends React.Component {
     render() {
         return <canvas
             id={"canvas"}
-            height={this.props.height}
-            width={this.props.width}
+            height={1000}
+            width={1000}
             ref={this.canvas}
         />
     }

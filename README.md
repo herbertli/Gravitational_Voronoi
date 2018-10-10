@@ -10,12 +10,6 @@ The server is written in Python 3. To run the server, execute:
 python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> [<use-graphics>]
 ```
 
-e.g.
-
-```
-python3 voronoi_game.py 10 2 127.0.0.1 3000 1
-```
-
 The last command line argument `<use-graphics>` is optional and graphics is only activated if you pass a `1` for this argument.
 
 Also note that ports `10000` and `8080` are reserved for the web interface, so please use some other port. After all clients have connected, press `<Enter>` to start the game.
@@ -38,26 +32,44 @@ If you wish to write your own client, please follow the server-client communicat
 
 1. Connect your client to the server.
 
-2. Receive game information. After connecting your client to the server, you should receive the game information from the server in the format of `"<number-of-players> <number-of-stones> <player-order>\n"`. The string is delimited by a space and ends with a new line character.
+2. Receive game information. After connecting your client to the server, you should receive the game information from the server in JSON:
+```
+{
+    "num_players": 2,
+    "num_stones": 10,
+    "player_number": 0
+}
+```
+Player_number is your id that is assigned to you by the server.
 
-3. Send team name. After receiving the game information, you should send your team name to the server as a string.
+3. Send team name in the following JSON format:
+```
+{
+    "player_name": "Botty McBotFace"
+}
+```
 
-4. Receive game updates. Your client will receive an update from the server when it is your turn. The update consists of three parts.
-   1. Game over flag. The flag is set to `1` when the game is over, and `0` otherwise
-   2. Scores. Say there are N players. Then there will be N numbers, representing the score from player 1 to player N.
+4. Receive game updates. Your client will receive an update from the server when it is your turn. Is looks like:
+```
+{
+    "game_over": false,
+    "scores": [35.0, 65.0],
+    "moves": [1, 1, 0, 100]
+}
+```
+   1. Game over flag
+   2. Scores. Say there are N players. Then there will be an array of N numbers, representing the score from player 1 to player N.
    3. New moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played.
 
-Notice that every number in the game update is separated by a space, and at the very end there will be a new line character.
-
-The following represents what a general game update looks like. Note that the move row and move columns are **0-indexed**, and move players are **1-indexed**.
-
+5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. The move should simply be a JSON object:
 ```
-"<game-over-flag> <score1> <score2> ... <move1-row> <move1-col> <move1-player> <move2-row> <move2-col> <move2-player> ...\n"
+{
+    "move_row": 100,
+    "move_col": 100
+}
 ```
 
-5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. The move should simply be a string `"<move_row> <move_col>"` - row and column of the move separated by a space.
-
-A special note on the player rotation protocol - although multiple games are played during one competition (number of games equals number of players), the client needs to complete step `1-3` once only. Moreover, the server does not explicitly indicate the start of a new game. Instead, the client should check if the most recent update has the `game-over-flag` set, and if so, the client should treat all future updates as updates for a new game. It might be helpful to take a look at how the sample client handles rotation if the description is not clear enough.
+A special note on the player rotation protocol - although multiple games are played during one competition (number of games equals number of players), the client needs to complete step `1-3` once only. Moreover, the server does not explicitly indicate the start of a new game. Instead, the client should check if the most recent update has the `game_over == true`, and if so, the client should treat all future updates as updates for a new game. It might be helpful to take a look at how the sample client handles rotation if the description is not clear enough.
 
 ## Running the game without display
 

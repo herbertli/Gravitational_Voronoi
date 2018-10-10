@@ -64,7 +64,9 @@ gameServer.on('connection', sock => {
   connectedClients++;
   console.log(`Game server connected from ${sock.remoteAddress}:${sock.remotePort}`);
   // Since this is a new client we reset the web interface
-  io.sockets.emit('to_client', 'reset\n');
+  io.sockets.emit('to_client', JSON.stringify({
+    'reset': true
+  }));
 
   // What to do when we get data
   sock.on('data', data => {

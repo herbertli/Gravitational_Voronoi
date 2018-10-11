@@ -4,6 +4,7 @@ import React, {
 import './App.css';
 import Board from './Board';
 import Sidebar from './Sidebar';
+import Timer from './Timer';
 import Gameover from './Gameover';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -26,8 +27,6 @@ class App extends Component {
       player_names: [],
       player_times: [],
       player_scores: [],
-      // keeps track across all games
-      total_scores: [],
       last_percentage: [],
       moves: [],
       timeTaken: 0
@@ -40,7 +39,6 @@ class App extends Component {
   resetBoard() {
     this.setState({
       in_lobby: true,
-      total_scores: [],
       last_percentage: [],
       bitmap: "",
       moves: [],
@@ -49,38 +47,28 @@ class App extends Component {
   }
 
   softReset() {
-    var tempTotalScores = this.state.total_scores.map((singleScore, i) => {
-      return singleScore + parseInt(this.state.player_scores[i], 10);
-    });
     this.setState({
       moves: [],
       bitmap: "",
-      game_over: false,
-      total_scores: tempTotalScores
+      game_over: false
     });
   }
 
   endGame() {
     clearInterval(this.clockInterval);
-    var tempTotalScores = this.state.total_scores.map((singleScore, i) => {
-      return singleScore + parseInt(this.state.player_scores[i], 10);
-    });
     this.setState({
       moves: [],
       bitmap: "",
-      game_over: true,
-      total_scores: tempTotalScores
+      game_over: true
     });
   }
 
   init(names) {
-    var tScores = [];
     var pScores = [];
     var pTimes = [];
     var lScores = [];
     var percent = [];
     for (var i = 0; i < names.length; i++) {
-      tScores.push(0);
       pScores.push(0);
       pTimes.push(120.0);
       lScores.push(0);
@@ -88,7 +76,6 @@ class App extends Component {
     }
     this.setState({
       player_names: names,
-      total_scores: tScores,
       player_scores: pScores,
       player_times: pTimes,
       num_players: names.length,
@@ -154,13 +141,15 @@ class App extends Component {
   resetClock(shouldClearInterval = false) {
     if (shouldClearInterval) {
       clearInterval(this.clockInterval);
+      this.setState({
+        timeTaken: 0
+      });
     }
-    this.clockStart = new Date().getTime();
     this.clockInterval = setInterval(() => {
-      let timeTaken = new Date().getTime() - this.clockStart;
-      timeTaken /= 1000;
-      this.setState({ timeTaken: timeTaken.toFixed(2) });
-    }, 100);
+      this.setState({
+        timeTaken: this.state.timeTaken + 1
+      });
+    }, 1000);
   }
 
   render() {
@@ -171,13 +160,15 @@ class App extends Component {
           Gravitational Voronoi
           </Typography>
         <Grid container spacing={32}>
+          <Grid item xs={2} />
           {
-            this.state.game_over ? <Grid item xs={12}>
+            this.state.game_over ? <Grid item xs={8}>
               <Gameover
                 player_names={this.state.player_names}
-                total_scores={this.state.total_scores}
-              /></Grid> :
-              <Grid item xs={12}>
+                total_scores={this.state.player_scores}
+              />
+            </Grid> :
+              <Grid item xs={8}>
                 <Sidebar
                   player_names={this.state.player_names}
                   player_scores={this.state.player_scores}
@@ -186,8 +177,11 @@ class App extends Component {
                   current_player={this.state.current_player}
                   percentages={this.state.percentages}
                 />
+                <br></br>
+                <Timer timer={this.state.timeTaken} />
               </Grid>
           }
+          <Grid item xs={2} />
           <Grid item xs={12}>
             <Board
               bitmap={this.state.bitmap}

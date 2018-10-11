@@ -5,6 +5,18 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = theme => ({
+    root: {
+        width: '100%',
+        marginTop: theme.spacing.unit * 3,
+        overflowX: 'auto',
+    },
+    table: {
+        minWidth: 700,
+    },
+});
 
 class Sidebar extends React.Component {
 
@@ -22,13 +34,15 @@ class Sidebar extends React.Component {
     ];
 
     render() {
+        const { classes } = this.props;
+
         let rows;
         if (!this.props.player_names || this.props.player_names.length === 0) {
             rows = <TableRow key={0}></TableRow>
         } else {
             rows = this.props.player_names.map((name, i) => {
                 return (
-                    <TableRow key={i} selected={this.props.current_player === i + 1 ? true : false}>
+                    <TableRow key={i} selected={this.props.current_player % this.props.player_names.length === i ? true : false}>
                         <TableCell style={{ background: this.colors[i] }}></TableCell>
                         <TableCell>{name}</TableCell>
                         <TableCell>{this.props.percentages[i]}</TableCell>
@@ -40,11 +54,11 @@ class Sidebar extends React.Component {
         }
 
         return (
-            <div>
+            <div className={classes.root}>
                 <Typography variant="h5" gutterBottom style={{ textAlign: "center" }}>
                     Players in Lobby
                 </Typography>
-                <Table padding={"dense"}>
+                <Table padding={"dense"} className={classes.table}>
                     <TableHead>
                         <TableRow>
                             <TableCell>#</TableCell>
@@ -65,4 +79,4 @@ class Sidebar extends React.Component {
 
 }
 
-export default Sidebar;
+export default withStyles(styles)(Sidebar);

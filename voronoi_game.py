@@ -291,7 +291,6 @@ class VoronoiGame:
             # do reset unless it's the last game
             if p != num_players - 1:
                 input("Press <Enter> to start next round")
-                # time.sleep(2)  # pause for 2 seconds in between games
                 self.__reset()
                 if use_graphic:
                     self.__soft_reset_node()

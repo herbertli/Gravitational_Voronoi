@@ -357,4 +357,7 @@ GitHub.sublime-settings
 ### VisualStudioCode ###
 .vscode
 
+### built files
+build/
+
 # End of https://www.gitignore.io/api/node,linux,macos,python,intellij,sublimetext,visualstudiocode

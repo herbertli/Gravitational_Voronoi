@@ -33,41 +33,41 @@ If you wish to write your own client, please follow the server-client communicat
 1. Connect your client to the server.
 
 2. Receive game information. After connecting your client to the server, you should receive the game information from the server in JSON:
-```
-{
-    "num_players": 2,
-    "num_stones": 10,
-    "player_number": 1
-}
-```
+    ```
+    {
+        "num_players": 2,
+        "num_stones": 10,
+        "player_number": 1
+    }
+    ```
 Player_number is your id that is assigned to you by the server.
 
 3. Send your team name in the following JSON format:
-```
-{
-    "player_name": "Botty McBotFace"
-}
-```
+    ```
+    {
+        "player_name": "Botty McBotFace"
+    }
+    ```
 
 4. Receive game updates. Your client will receive an update from the server when it is your turn. Is looks like:
-```
-{
-    "game_over": false,
-    "scores": [35.0, 65.0],
-    "moves": [[1, 1, 0], [100, 100, 1], [1, 1, 2]]
-}
-```
+    ```
+    {
+        "game_over": false,
+        "scores": [35.0, 65.0],
+        "moves": [[1, 1, 0], [100, 100, 1], [1, 1, 2]]
+    }
+    ```
    1. Game over flag
    2. Scores. Say there are N players. Then there will be an array of N numbers, representing the score from player 1 to player N.
    3. Moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played.
 
 5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. The move should simply be a JSON object:
-```
-{
-    "move_row": 100,
-    "move_col": 100
-}
-```
+    ```
+    {
+        "move_row": 100,
+        "move_col": 100
+    }
+    ```
 
 A special note on the player rotation protocol - although multiple games are played during one competition (number of games equals number of players), the client needs to complete step `1-3` once only. 
 

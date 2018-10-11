@@ -5,10 +5,12 @@
   "dependencies": {
     "@material-ui/core": "^3.2.0",
     "@material-ui/icons": "^3.0.1",
+    "prop-types": "^15.6.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-scripts": "2.0.4",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.1.1",
+    "socket.io-client": "^2.1.1"
   },
   "scripts": {
     "start": "PORT=3006 react-scripts start",
@@ -18,7 +20,15 @@
     "postbuild": "rm -rf ../public && mv build ../public"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "airbnb"
+    ],
+    "rules": {
+      "camelcase": "off",
+      "react/forbid-prop-types": "off",
+      "react/jsx-filename-extension": "off"
+    }
   },
   "browserslist": [
     ">0.2%",

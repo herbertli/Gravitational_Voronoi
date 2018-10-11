@@ -93,10 +93,21 @@ Finally, press `<Enter>` in the server terminal to start the game when prompted.
 
 First you must make sure you have `node.js` and `npm` installed. You also need relatively modern versions of both `node.js` and the browser you will be using for the display, though nothing bleeding edge is needed. But if you encounter any errors, you should always try upgrading your browser/`node.js` first.
 
-Now first install the single dependency (socket.io) if you haven't already:
+Now first build the contents of the web/ folder:
 
 ```
+cd web/
 npm install
+npm run-script build
+cd ..
+```
+
+Or, build with yarn (recommended)
+```
+cd web/
+yarn install
+yarn build
+cd ..
 ```
 
 To run the game with the display, first run the web server with
@@ -114,10 +125,4 @@ python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> 
 Every time you start a new server the board will reset on your display.
 
 ### Saving boards from display
-If you wish to save the boards (artworks) from the games you play you simply do exactly the same as above except you add a command line argument 1 to the web server as follows:
-
-```
-node web.js 1
-```
-
-and all the boards will be saved as PNG files in a folder which will be created if it doesn't already exist called artworks in the root of this project.
+If you wish to save the boards (artworks) from the games you play, you can right click to save the image

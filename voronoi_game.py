@@ -26,7 +26,7 @@ class VoronoiGame:
         for i in range(num_players):
             self.pull.append([[0] * grid_size for j in range(grid_size)])
         self.current_player = 0
-        self.moves_made = 0
+        self.moves_made = [0] * num_players
         self.game_over = False
         self.epsilon = 1e-9
 
@@ -51,7 +51,7 @@ class VoronoiGame:
         for i in range(num_players):
             self.pull.append(
                 [[0] * self.grid_size for j in range(self.grid_size)])
-        self.moves_made = 0
+        self.moves_made = [0] * num_players
         self.game_over = False
 
     def __get_game_state(self):
@@ -67,6 +67,7 @@ class VoronoiGame:
                 break
             new_moves.append(self.moves[i])
         game_info["moves"] = new_moves
+        game_info["remaining_time"] = self.player_times[self.current_player]
         return game_info
 
     def __broadcast_game_info(self):
@@ -153,7 +154,7 @@ class VoronoiGame:
         player_name = self.server.names[self.current_player]
         player_time = self.player_times[self.current_player]
         print("Waiting for {}".format(player_name))
-        print("They have {} seconds remaining".format(player_time))
+        print("They have {} seconds remaining...".format(player_time))
 
         start_time = time.time()
         client_response = self.server.receive(self.current_player)
@@ -176,7 +177,7 @@ class VoronoiGame:
                     float(1) / (d*d))
 
                 # first move claims every cell on the grid
-                if self.moves_made == 1:
+                if sum(self.moves_made) == 1:
                     self.score_grid[row][col] = self.current_player + 1
                     self.scores[self.current_player] += 1
                 # not first move
@@ -248,24 +249,42 @@ class VoronoiGame:
             self.current_player = p
             while True:
                 self.current_player = self.current_player % self.num_players
-                self.__broadcast_game_info()
-                if (self.game_over):
+                
+                if self.game_over:
+                    self.__broadcast_game_info()
                     break
+                
+                # current player has run out of time
+                if self.player_times[self.current_player] <= 0:
+                    print("Player", self.current_player + 1, "has run out of time.")
+                    self.current_player += 1
+                    continue
 
                 # get and validate move
+                self.__broadcast_game_info()
                 move_row, move_col = self.__get_player_move()
                 print("{} has placed their stone on: {}, {}".format(
                     self.server.names[self.current_player], move_row, move_col))
+                
                 if not self.__is_legal_move(move_row, move_col):
-                    print("Move is illegal, skipping the current player")
+                    print("Move is illegal, ignoring the current player")
+                    self.moves_made[self.current_player] += 1
+                    self.current_player += 1
+                    continue
+                elif self.player_times[self.current_player] < 0:
+                    print("Player", self.current_player + 1, "has run out of time making their move.")
+                    self.current_player += 1
                     continue
 
                 # move is legal, do some book-keeping
-                self.moves_made += 1
+                self.moves_made[self.current_player] += 1
                 self.grid[move_row][move_col] = self.current_player + 1
                 self.moves.append(
                     [move_row, move_col, self.current_player + 1])
                 self.__update_scores(move_row, move_col)
+                # if I've made all my moves, the game is over for me!
+                if self.moves_made[self.current_player] == self.num_stones:
+                    self.player_times[self.current_player] = 0
 
                 # send data to node server
                 if self.use_graphic:
@@ -273,10 +292,12 @@ class VoronoiGame:
                         move_row=move_row, move_col=move_col)
 
                 # check for game over conditions
-                if self.player_times[self.current_player] < 0:
-                    self.scores[self.current_player] = -2
-                    self.game_over = True
-                if self.moves_made == self.num_players * self.num_stones:
+                # all players have made all their moves or all players have run out of time
+                playersLeft = 0
+                for i in self.player_times:
+                    if i > 0:
+                        playersLeft += 1
+                if playersLeft == 0:
                     self.game_over = True
 
                 # switch player

@@ -32,7 +32,6 @@ class VoronoiServer:
             print("Connection from Player", self.names[i - 1], "established.")
 
     def send(self, obj, player: int):
-        print(obj)
         self.connection[player].sendall(json.dumps(obj).encode('utf-8'))
 
     def receive(self, player: int):

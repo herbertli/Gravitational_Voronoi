@@ -116,6 +116,13 @@ class Client:
                 scores = game_state["scores"]
                 # new moves
                 new_moves = game_state["moves"]
+                # time
+                self.remaining_time = game_state["remaining_time"]
+                print("I have", self.remaining_time, "to make my move.")
+                print("Current Scores:", scores)
+                print("My Score:", scores[self.player_number - 1])
+                print("New Moves:", new_moves)
+                print()
 
                 # insert new moves into the grid
                 for i in range(len(new_moves)):
@@ -138,6 +145,7 @@ class Client:
                 self.__send_move(my_move_row, my_move_col)
                 print("Played at row {}, col {}".format(
                     my_move_row, my_move_col))
+                print()
 
         self.sock.close()
 

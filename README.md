@@ -50,16 +50,18 @@ Player_number is your id that is assigned to you by the server.
     ```
     Steps 1-3 only need to be completed once! Once all players are connected, the round begins. Your bot should now be listening for game updates.
 
-4. Receive game updates. Your client will receive an update from the server when it is your turn. It looks like:
+4. Receive game updates. Your client will receive an update from the server when it is your turn, provided you haven't used up all of your time. It looks like:
     ```
     {
         "game_over": false,
+        "remaining_time": 120.0,
         "scores": [35, 35, 30],
         "moves": [[1, 1, 1], [100, 100, 2]]
     }
     ```
    1. Game over flag, `true` if the game is over. 
-   2. Scores. Say there are N players. Then there will be an array of N numbers, representing the score from player 1 to player N.
+   2. Your remaining time.
+   3. Scores. Say there are N players. Then there will be an array of N numbers, representing the score from player 1 to player N.
    3. Moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move (1-indexed). The moves are ordered in the order in which they were played. *Note that if you are the first player to move, this array will be empty*
 
 5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. If you make an illegal move, it is ignored. The move should simply be a JSON object:

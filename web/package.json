@@ -12,6 +12,7 @@
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1"
   },
+  "homepage": ".",
   "scripts": {
     "start": "PORT=3006 react-scripts start",
     "build": "react-scripts build",

@@ -12,7 +12,7 @@ python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> 
 
 The last command line argument `<use-graphics>` is optional and graphics is only activated if you pass a `1` for this argument.
 
-Also note that ports `10000` and `8080` are reserved for the web interface, so please use some other port. After all clients have connected, press `<Enter>` to start the game.
+Also note that ports `10000` and `8080` are reserved for the web interface and socket server, so please use some other port. After all clients have connected, press `<Enter>` to start the game.
 
 The server calculates the area of influence of each player discretely on a 1000 by 1000 grid. The final score of each player is the number of cells under the influence of that player.
 
@@ -48,20 +48,21 @@ Player_number is your id that is assigned to you by the server.
         "player_name": "Botty McBotFace"
     }
     ```
+    Steps 1-3 only need to be completed once! Once all players are connected, the round begins. Your bot should now be listening for game updates.
 
-4. Receive game updates. Your client will receive an update from the server when it is your turn. Is looks like:
+4. Receive game updates. Your client will receive an update from the server when it is your turn. It looks like:
     ```
     {
         "game_over": false,
-        "scores": [35.0, 65.0],
-        "moves": [[1, 1, 0], [100, 100, 1], [1, 1, 2]]
+        "scores": [35, 35, 30],
+        "moves": [[1, 1, 0], [100, 100, 1]]
     }
     ```
-   1. Game over flag
+   1. Game over flag, `true` if the game is over. 
    2. Scores. Say there are N players. Then there will be an array of N numbers, representing the score from player 1 to player N.
-   3. Moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played.
+   3. Moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played. *Note that if you are the first player to move, this array will be empty*
 
-5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. The move should simply be a JSON object:
+5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. If you make an illegal move, it is ignored. The move should simply be a JSON object:
     ```
     {
         "move_row": 100,
@@ -69,13 +70,11 @@ Player_number is your id that is assigned to you by the server.
     }
     ```
 
-A special note on the player rotation protocol - although multiple games are played during one competition (number of games equals number of players), the client needs to complete step `1-3` once only. 
-
-The client should check if the most recent update has the `game_over == true`, and if so, the client should treat all future updates as updates for a new game. It might be helpful to take a look at how the sample client handles rotation if the description is not clear enough.
+6. When the game over flag is true, every client receives a game update message saying the current round has ended. *You do not need to complete steps `1-3` again!* Instead, client should reset itself and treat all future updates as updates for a new game. Note that if your client is going first, you will receive a game update message from the server in which the moves array is empty. After you receive such message, send your move to the server. It might be helpful to take a look at how the sample client handles rotation if you are still confused.
 
 ## Running the game without display
 
-To run the game without the display, run the server with:
+To run the game without the display, run the game server with:
 
 ```
 python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port>
@@ -87,13 +86,19 @@ and run each client with (if you are using the client provided here):
 python3 voronoi_client.py <server-ip> <port> <team-name>
 ```
 
-Finally, press `<Enter>` in the server terminal to start the game when prompted.
+Finally, press `<Enter>` in the server terminal to start the game/round when prompted.
 
 ## Running the game with display
 
 First you must make sure you have `node.js` and `npm` installed. You also need relatively modern versions of both `node.js` and the browser you will be using for the display, though nothing bleeding edge is needed. But if you encounter any errors, you should always try upgrading your browser/`node.js` first.
 
-Now first build the contents of the web/ folder:
+First build the contents of the root folder:
+```
+cd Gravitational_Voronoi
+npm install
+```
+
+Now, build the contents of the web/ folder with npm:
 
 ```
 cd web/
@@ -102,7 +107,7 @@ npm run-script build
 cd ..
 ```
 
-Or, build with yarn (recommended)
+Or, build with yarn (recommended):
 ```
 cd web/
 yarn install
@@ -110,7 +115,7 @@ yarn build
 cd ..
 ```
 
-To run the game with the display, first run the web server with
+Finally, to run the game with the display, first run the web server with:
 
 ```
 node web.js
@@ -122,7 +127,8 @@ and then open `localhost:10000` in your browser. You are now ready to run as man
 python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> 1
 ```
 
-Every time you start a new server the board will reset on your display.
+Try not to refresh the page! At the moment, the board display will bug out.
+Every time you start a new server, the board will reset on your display.
 
 ### Saving boards from display
 If you wish to save the boards (artworks) from the games you play, you can right click to save the image

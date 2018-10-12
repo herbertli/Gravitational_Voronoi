@@ -7,19 +7,26 @@ import json
 
 
 class Client:
+
+    """
+    Perform steps 1-3 in constructor, as they are only done once anyways
+    """
     def __init__(self, host: str, port: int, name: str):
         self.host = host
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.name = name
-
-        # hard-coded game info
         self.grid_size = 1000
         self.min_dist = 66
 
-        # connect to server and get game info
+        """
+        Step 1. Connect to server
+        """
         self.sock.connect((host, port))
 
+        """
+        Step 2. Receive game info from server
+        """
         game_state = self.__receive_game_state()
         self.num_players = game_state["num_players"]
         self.num_stone = game_state["num_stones"]
@@ -28,24 +35,23 @@ class Client:
         self.grid = [[0] * self.grid_size for i in range(self.grid_size)]
         self.moves = []  # store history of moves
 
-        # send name to serer
+        """
+        Step 3. Send your name to server
+        """
         self.__send({
             "player_name": self.name
         })
-        print("Client initialized")
+        print("Client initialized! Player name:", self.name)
 
     def __reset(self):
         self.grid = [[0] * self.grid_size for i in range(self.grid_size)]
         self.moves = []
 
-    def __receive(self) -> object:
+    def __receive_game_state(self) -> object:
         return json.loads(self.sock.recv(4096).decode("utf-8"))
 
     def __send(self, obj: object):
         self.sock.sendall(json.dumps(obj).encode("utf-8"))
-
-    def __receive_game_state(self) -> object:
-        return self.__receive()
 
     def __send_move(self, move_row: int, move_col: int):
         self.__send({
@@ -53,6 +59,11 @@ class Client:
             "move_col": move_col
         })
 
+    """
+    Checker methods
+    This is also how they are implemented server-side, so you might want to use these
+    methods to double check your move
+    """
     def __compute_distance(self, row1: int, col1: int, row2: int, col2: int) -> float:
         return math.sqrt((row2 - row1)**2 + (col2 - col1)**2)
 
@@ -62,8 +73,10 @@ class Client:
                 return False
         return True
 
-    # your algorithm goes here
-    # a naive random algorithm is provided as a placeholder
+    """
+    TODO: Your algorithm goes here
+    A naive random algorithm is provided as a placeholder
+    """
     def __getMove(self) -> (int, int):
         move_row = 0
         move_col = 0
@@ -76,15 +89,29 @@ class Client:
         time.sleep(random.randint(1, 3))
         return move_row, move_col
 
+    """
+    Main game flow
+    """
     def start(self):
         for p in range(self.num_players):
             while True:
+                
+                """
+                Step 4: receive game update, once received, it is now my move!
+                """
                 game_state = self.__receive_game_state()
-                # check if game is over
+                
+                """
+                Step 6: check if game is over...
+                If so, wait for another game update which will indicate that it is your turn again
+                """
                 if game_state["game_over"]:
                     print("Game over")
+                    # reset state
+                    self.grid = [[0] * self.grid_size for i in range(self.grid_size)]
+                    self.moves = []
                     break
-
+                
                 # scores
                 scores = game_state["scores"]
                 # new moves
@@ -102,7 +129,9 @@ class Client:
                     else:
                         print("Error: player info incorrect")
 
-                # make move
+                """
+                Step 5: make my move
+                """
                 my_move_row, my_move_col = self.__getMove()
                 self.moves.append(
                     [my_move_row, my_move_col, self.player_number])

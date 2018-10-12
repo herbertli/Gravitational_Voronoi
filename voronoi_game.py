@@ -18,7 +18,8 @@ class VoronoiGame:
         self.score_grid = [[0] * grid_size for i in range(grid_size)]
         self.scores = [0] * num_players
         self.player_times = [120.0] * num_players
-        # store moves played, each move corresponds to 3 entries
+        # store moves played
+        # each move corresponds is a list of 3 numbers
         self.moves = []
         # gravitational pull, pull[i] is 2d-array of the pull player i has in total
         self.pull = []
@@ -138,7 +139,7 @@ class VoronoiGame:
             print("({}, {}) is out of bounds".format(row, col))
             return False
         # check for min dist requirement
-        for move_start in range(0, len(self.moves)):
+        for move_start in range(len(self.moves)):
             move_row = self.moves[move_start][0]
             move_col = self.moves[move_start][1]
             if (self.__compute_distance(row, col, move_row, move_col) < self.min_dist):

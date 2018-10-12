@@ -24,7 +24,7 @@ class VoronoiServer:
             self.send({
                 "num_players": num_players,
                 "num_stones": num_stones,
-                "player_number": i - 1
+                "player_number": i
             }, i - 1)
 
             response = self.receive(i - 1)

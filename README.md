@@ -55,12 +55,12 @@ Player_number is your id that is assigned to you by the server.
     {
         "game_over": false,
         "scores": [35, 35, 30],
-        "moves": [[1, 1, 0], [100, 100, 1]]
+        "moves": [[1, 1, 1], [100, 100, 2]]
     }
     ```
    1. Game over flag, `true` if the game is over. 
    2. Scores. Say there are N players. Then there will be an array of N numbers, representing the score from player 1 to player N.
-   3. Moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move. The moves are ordered in the order in which they were played. *Note that if you are the first player to move, this array will be empty*
+   3. Moves. These are the moves that have been played after you played your last move. Each move consists of three numbers: the row of the move, the column of the move, and the player than made the move (1-indexed). The moves are ordered in the order in which they were played. *Note that if you are the first player to move, this array will be empty*
 
 5. Send move to server. After receiving a game update from the server, your client should finish your turn by sending a move to the server. If you make an illegal move, it is ignored. The move should simply be a JSON object:
     ```

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/guyu96/Gravitational_Voronoi#readme",
   "dependencies": {
     "express": "^4.15.2",
+    "pako": "^1.0.6",
     "socket.io": "^2.0.3"
   }
 }

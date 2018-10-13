@@ -5,6 +5,7 @@ import sys
 import math
 import socket
 import json
+import zlib
 
 
 class VoronoiGame:
@@ -121,7 +122,7 @@ class VoronoiGame:
         data["player_names"] = self.server.names
         data["game_over"] = self.game_over
         data["soft-reset"] = soft_reset
-        self.graphic_socket.sendall(json.dumps(data).encode("utf-8"))
+        self.graphic_socket.sendall(zlib.compress(bytearray(json.dumps(data), "utf-8")))
 
     def __soft_reset_node(self):
         self.__send_update_to_node(soft_reset=True)
@@ -304,9 +305,9 @@ class VoronoiGame:
                 self.current_player += 1
 
             if self.use_graphic:
-                self.graphic_socket.sendall(json.dumps({
+                self.graphic_socket.sendall(zlib.compress(bytearray(json.dumps({
                     "game_over": True
-                }).encode("utf-8"))
+                }), "utf-8")))
             self.__declare_winner()
             print("Game over")
 

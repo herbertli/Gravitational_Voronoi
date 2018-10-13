@@ -3,6 +3,7 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+const pako = require('pako');
 
 app.use(express.static(path.join(__dirname, 'build')));
 
@@ -12,8 +13,8 @@ http.listen(10000, function () {
 
 // ----------------------------------------------------------------------------
 
-const StringDecoder = require('string_decoder').StringDecoder;
-const decoder = new StringDecoder('utf8');
+// const StringDecoder = require('string_decoder').StringDecoder;
+// const decoder = new StringDecoder('utf8');
 
 // Set up the TCP server to communicate with the game server
 const net = require('net');
@@ -33,13 +34,11 @@ gameServer.on('connection', sock => {
   connectedClients++;
   console.log(`Game server connected from ${sock.remoteAddress}:${sock.remotePort}`);
   // Since this is a new client we reset the web interface
-  io.sockets.emit('to_client', JSON.stringify({
-    'reset': true
-  }));
+  io.sockets.emit('to_client', pako.deflate(JSON.stringify({ 'reset': true }), { to: 'string' }));
 
   // What to do when we get data
   sock.on('data', data => {
-    io.sockets.emit('to_client', decoder.write(data));
+    io.sockets.emit('to_client', data);
   });
 
   sock.on('close', () => {

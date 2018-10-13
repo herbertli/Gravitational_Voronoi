@@ -1,4 +1,5 @@
 import React from 'react';
+import pako from 'pako';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import openSocket from 'socket.io-client';
@@ -42,7 +43,8 @@ class App extends React.Component {
       const {
         in_lobby, num_players, moves, percentages,
       } = this.state;
-      const gameState = JSON.parse(data);
+      const gameState = JSON.parse(pako.inflate(data, { to: 'string' }));
+      console.log(gameState);
       if (gameState.reset) {
         this.resetBoard();
       } else if (in_lobby) {

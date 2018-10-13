@@ -34,6 +34,8 @@ class Board extends React.Component {
     [0, 128, 128],
   ];
 
+  pull = [];
+
   constructor(props) {
     super(props);
     this.canvas = React.createRef();

@@ -40,7 +40,7 @@ gameServer.on('connection', sock => {
   // What to do when we get data
   sock.on('data', data => {
     io.sockets.emit('to_client', decoder.write(data));
-  })
+  });
 
   sock.on('close', () => {
     connectedClients--;

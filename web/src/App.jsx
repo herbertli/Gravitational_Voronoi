@@ -10,11 +10,13 @@ import Gameover from './Gameover';
 
 class App extends React.Component {
   clockInterval = setInterval(() => {
-    const { timeTaken } = this.state;
-    this.setState({
-      timeTaken: timeTaken + 1,
-    });
-  }, 1000);;
+    const { timeTaken, in_lobby, game_over } = this.state;
+    if (!in_lobby && !game_over) {
+      this.setState({
+        timeTaken: timeTaken + 1,
+      });
+    }
+  }, 1000);
 
   constructor(props) {
     super(props);
@@ -28,6 +30,7 @@ class App extends React.Component {
       player_times: [],
       player_scores: [],
       last_percentage: [],
+      percentages: [],
       moves: [],
       timeTaken: 0,
     };
@@ -37,7 +40,7 @@ class App extends React.Component {
     this.socket = openSocket('http://localhost:10000');
     this.socket.on('to_client', (data) => {
       const {
-        in_lobby, moves, num_players, player_scores, percentages,
+        in_lobby, num_players, moves, percentages,
       } = this.state;
       const gameState = JSON.parse(data);
       if (gameState.reset) {
@@ -49,6 +52,7 @@ class App extends React.Component {
       } else if (gameState.game_over) {
         this.endGame();
       } else {
+        const { player_scores, player_times, current_player } = gameState;
         const nMoves = [...moves];
         if (nMoves.length === 0) {
           for (let i = 0; i < num_players; i += 1) {
@@ -57,7 +61,6 @@ class App extends React.Component {
         }
         const currentTurn = parseInt(gameState.current_player, 10);
         nMoves[currentTurn - 1].push([gameState.move_col, gameState.move_row]);
-
         // calculate scores for current round of current game
         const nPercentages = [];
         let totalRoundScore = 0;
@@ -65,16 +68,18 @@ class App extends React.Component {
           totalRoundScore += parseInt(singleScore, 10);
         });
         player_scores.forEach((score) => {
-          const percentageRoundScore = (100 * parseInt(score, 10) / totalRoundScore).toFixed(1);
-          nPercentages.push(percentageRoundScore);
+          if (score === 0) nPercentages.push(0);
+          else {
+            const percentageRoundScore = (100 * parseInt(score, 10) / totalRoundScore).toFixed(1);
+            nPercentages.push(percentageRoundScore);
+          }
         });
-
         this.setState({
-          percentages: nPercentages,
           last_percentage: percentages,
-          current_player: gameState.current_player,
-          player_scores: gameState.player_scores,
-          player_times: gameState.player_times,
+          percentages: nPercentages,
+          current_player,
+          player_scores,
+          player_times,
           bitmap: gameState.bitmap,
           moves: nMoves,
           timeTaken: 0,
@@ -118,7 +123,7 @@ class App extends React.Component {
     for (let i = 0; i < names.length; i += 1) {
       pScores.push(0);
       pTimes.push(120.0);
-      lScores.push(0);
+      lScores.push('--');
       percent.push(0);
     }
     this.setState({

@@ -11,7 +11,7 @@ const Timer = (props) => {
       <Typography variant="h5" gutterBottom style={{ textAlign: 'center' }}>
           Move Timer (estimated):
       </Typography>
-      <Typography variant="display1" gutterBottom style={{ textAlign: 'center' }}>
+      <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
         {minutes}
         :
         {seconds < 10 ? '0' : ''}

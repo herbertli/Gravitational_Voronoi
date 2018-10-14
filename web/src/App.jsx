@@ -1,8 +1,7 @@
 import React from 'react';
-import pako from 'pako';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import openSocket from 'socket.io-client';
+import { subscribeToSocketIO, subscribeToFirebase } from './subscribers';
 import './App.css';
 import Board from './Board';
 import Sidebar from './Sidebar';
@@ -38,56 +37,59 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.socket = openSocket('http://localhost:10000');
-    this.socket.on('to_client', (data) => {
-      const {
-        in_lobby, num_players, moves, percentages,
-      } = this.state;
-      const gameState = JSON.parse(pako.inflate(data, { to: 'string' }));
-      console.log(gameState);
-      if (gameState.reset) {
-        this.resetBoard();
-      } else if (in_lobby) {
-        this.init(gameState.player_names);
-      } else if (gameState['soft-reset']) {
-        this.softReset();
-      } else if (gameState.game_over) {
-        this.endGame();
-      } else {
-        const { player_scores, player_times, current_player } = gameState;
-        const nMoves = [...moves];
-        if (nMoves.length === 0) {
-          for (let i = 0; i < num_players; i += 1) {
-            nMoves.push([]);
-          }
+    if (process.env.USE_SOCKETIO) {
+      subscribeToSocketIO((data) => this.parseData(data));
+    } else {
+      subscribeToFirebase((data) => this.parseData(data));
+    }
+  }
+
+  parseData = (gameState) => {
+    const {
+      in_lobby, num_players, moves, percentages,
+    } = this.state;
+    if (gameState.reset) {
+      this.resetBoard();
+    } else if (in_lobby) {
+      this.init(gameState.player_names);
+    } else if (gameState['soft-reset']) {
+      this.softReset();
+    } else if (gameState.game_over) {
+      this.endGame();
+    } else {
+      const { player_scores, player_times, current_player } = gameState;
+      const nMoves = [...moves];
+      if (nMoves.length === 0) {
+        for (let i = 0; i < num_players; i += 1) {
+          nMoves.push([]);
         }
-        const currentTurn = parseInt(gameState.current_player, 10);
-        nMoves[currentTurn - 1].push([gameState.move_col, gameState.move_row]);
-        // calculate scores for current round of current game
-        const nPercentages = [];
-        let totalRoundScore = 0;
-        player_scores.forEach((singleScore) => {
-          totalRoundScore += parseInt(singleScore, 10);
-        });
-        player_scores.forEach((score) => {
-          if (score === 0) nPercentages.push(0);
-          else {
-            const percentageRoundScore = (100 * parseInt(score, 10) / totalRoundScore).toFixed(1);
-            nPercentages.push(percentageRoundScore);
-          }
-        });
-        this.setState({
-          last_percentage: percentages,
-          percentages: nPercentages,
-          current_player,
-          player_scores,
-          player_times,
-          bitmap: gameState.bitmap,
-          moves: nMoves,
-          timeTaken: 0,
-        });
       }
-    });
+      const currentTurn = parseInt(gameState.current_player, 10);
+      nMoves[currentTurn - 1].push([gameState.move_col, gameState.move_row]);
+      // calculate scores for current round of current game
+      const nPercentages = [];
+      let totalRoundScore = 0;
+      player_scores.forEach((singleScore) => {
+        totalRoundScore += parseInt(singleScore, 10);
+      });
+      player_scores.forEach((score) => {
+        if (score === 0) nPercentages.push(0);
+        else {
+          const percentageRoundScore = (100 * parseInt(score, 10) / totalRoundScore).toFixed(1);
+          nPercentages.push(percentageRoundScore);
+        }
+      });
+      this.setState({
+        last_percentage: percentages,
+        percentages: nPercentages,
+        current_player,
+        player_scores,
+        player_times,
+        bitmap: gameState.bitmap,
+        moves: nMoves,
+        timeTaken: 0,
+      });
+    }
   }
 
   resetBoard() {

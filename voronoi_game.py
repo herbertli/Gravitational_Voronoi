@@ -6,10 +6,10 @@ import math
 import socket
 import json
 import zlib
-
+import pyrebase
 
 class VoronoiGame:
-    def __init__(self, num_stones: int, num_players: int, grid_size: int, min_dist: int, host: str, port: int, use_graphic: bool):
+    def __init__(self, num_stones: int, num_players: int, grid_size: int, min_dist: int, host: str, port: int, use_graphic: bool, use_firebase: bool):
         # game variables
         self.num_stones = num_stones
         self.num_players = num_players
@@ -40,6 +40,12 @@ class VoronoiGame:
             self.graphic_socket = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM)
             self.graphic_socket.connect(('localhost', 8080))
+        self.use_firebase = use_firebase
+        if use_firebase:
+            with open('config.json') as f:
+                config = json.load(f)
+                firebase = pyrebase.initialize_app(config)
+                self.db = firebase.database()
 
     def __reset(self):
         # reset game after a round
@@ -107,6 +113,22 @@ class VoronoiGame:
                 if i == 1000:
                     break
         return decompressed_bitmap
+    
+    def __send_update_to_fb(self, move_row=False, move_col=False, soft_reset=False):
+        data = {}
+        data["bitmap"] = self.__generate_compressed_game_bitmap()
+        # Add rest of meta data
+        data["player_times"] = self.player_times
+        data["player_scores"] = self.scores
+        data["num_players"] = self.num_players
+        data["current_player"] = self.current_player + 1
+        if move_row and move_col:
+            data["move_row"] = move_row
+            data["move_col"] = move_col
+        data["player_names"] = self.server.names
+        data["game_over"] = self.game_over
+        data["soft-reset"] = soft_reset
+        self.db.child("gameState").update(data)
 
     def __send_update_to_node(self, move_row=False, move_col=False, soft_reset=False):
         data = {}
@@ -126,6 +148,9 @@ class VoronoiGame:
 
     def __soft_reset_node(self):
         self.__send_update_to_node(soft_reset=True)
+    
+    def __soft_reset_fb(self):
+        self.__send_update_to_fb(soft_reset=True)
 
     def __compute_distance(self, row1: int, col1: int, row2: int, col2: int) -> float:
         return math.sqrt((row2 - row1)**2 + (col2 - col1)**2)
@@ -246,6 +271,8 @@ class VoronoiGame:
         input("Press <Enter> to Start!")
         if self.use_graphic:
             self.__send_update_to_node()
+        if self.use_firebase:
+            self.__send_update_to_fb()
         for p in range(self.num_players):
             self.current_player = p
             while True:
@@ -289,8 +316,9 @@ class VoronoiGame:
 
                 # send data to node server
                 if self.use_graphic:
-                    self.__send_update_to_node(
-                        move_row=move_row, move_col=move_col)
+                    self.__send_update_to_node(move_row=move_row, move_col=move_col)
+                if self.use_firebase:
+                    self.__send_update_to_fb(move_row=move_row, move_col=move_col)
 
                 # check for game over conditions
                 # all players have made all their moves or all players have run out of time
@@ -308,6 +336,10 @@ class VoronoiGame:
                 self.graphic_socket.sendall(zlib.compress(bytearray(json.dumps({
                     "game_over": True
                 }), "utf-8")))
+            if self.use_firebase:
+                self.db.child("gameState").update({
+                    "game_over": True
+                })
             self.__declare_winner()
             print("Game over")
 
@@ -315,8 +347,10 @@ class VoronoiGame:
             if p != num_players - 1:
                 input("Press <Enter> to start next round")
                 self.__reset()
-                if use_graphic:
+                if self.use_graphic:
                     self.__soft_reset_node()
+                if self.use_firebase:
+                    self.__soft_reset_fb()
 
 
 if __name__ == "__main__":
@@ -333,6 +367,10 @@ if __name__ == "__main__":
     if len(sys.argv) == 6 and int(sys.argv[5]) == 1:
         use_graphic = True
 
+    use_firebase = False
+    if len(sys.argv) == 6 and int(sys.argv[5]) == 2:
+        use_firebase = True
+
     game = VoronoiGame(num_stones, num_players, GRID_SIZE,
-                       MIN_DIST, host, port, use_graphic)
+                       MIN_DIST, host, port, use_graphic, use_firebase)
     game.start()

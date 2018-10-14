@@ -12,8 +12,10 @@ function subscribeToSocketIO(cb) {
 function subscribeToFirebase(cb) {
   firebase.initializeApp(config);
   const ref = firebase.database().ref('gameState');
+  let initialLoad = true;
   ref.on('value', (snapshot) => {
-    cb(snapshot.val());
+    if (!initialLoad) cb(snapshot.val());
+    initialLoad = false;
   });
 }
 

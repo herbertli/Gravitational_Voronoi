@@ -69,7 +69,7 @@ class VoronoiGame:
         game_info["scores"] = self.scores
         # new moves - go through move history in reverse order and stop when a move by current player is found
         new_moves = []
-        for i in range(len(self.moves) - 1, 1, -1):
+        for i in range(len(self.moves) - 1, -1, -1):
             if (self.moves[i][2] == self.current_player + 1):
                 break
             new_moves.append(self.moves[i])
@@ -83,6 +83,7 @@ class VoronoiGame:
             for i in range(num_players):
                 self.server.send(game_info, i)
         else:
+            print("Sending:", game_info, "to:", self.current_player)
             self.server.send(game_info, self.current_player)
 
     def __generate_compressed_game_bitmap(self) -> str:

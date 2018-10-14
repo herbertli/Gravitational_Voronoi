@@ -51,7 +51,7 @@ class Sidebar extends React.Component {
       rows = <TableRow key="noPlayers" />;
     } else {
       rows = player_names.map((name, i) => (
-        <TableRow key={name} selected={current_player % player_names.length === i}>
+        <TableRow key={name} selected={(current_player % player_names.length) === i}>
           <TableCell style={{ background: this.colors[i] }} />
           <TableCell>{name}</TableCell>
           <TableCell>{percentages[i]}</TableCell>

@@ -34,21 +34,35 @@ class Board extends React.Component {
     [0, 128, 128],
   ];
 
-  pull = [];
-
   constructor(props) {
     super(props);
     this.canvas = React.createRef();
   }
 
+  componentDidMount() {
+    const { bitmap, moves } = this.props;
+    const ctx = this.canvas.current.getContext('2d');
+    if (!bitmap || !moves) {
+      return;
+    } else {
+      this.drawBoard(ctx, bitmap);
+      this.drawStones(ctx, moves);
+    }
+  }
+
   componentDidUpdate() {
     const { bitmap, moves } = this.props;
     const ctx = this.canvas.current.getContext('2d');
-    if (!bitmap || bitmap === '' || moves.length === 0) {
-      return;
+    if (!bitmap || !moves) {
+      this.clearCanvas(ctx);
+    } else {
+      this.drawBoard(ctx, bitmap);
+      this.drawStones(ctx, moves);
     }
-    this.drawBoard(ctx, bitmap);
-    this.drawStones(ctx, moves);
+  }
+
+  clearCanvas(ctx) {
+    ctx.clearRect(0, 0, 1000, 1000);
   }
 
   drawStones(ctx, moves) {

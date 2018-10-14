@@ -126,6 +126,7 @@ class App extends React.Component {
       last_percentage: [],
       bitmap: '',
       moves: [],
+      current_player: 0,
       game_over: false,
     });
   }
@@ -198,7 +199,7 @@ class App extends React.Component {
       moves,
       choseBE
     } = this.state;
-    console.log(this.state);
+    // console.log(this.state);
     if (!choseBE) {
       return (
         <div>

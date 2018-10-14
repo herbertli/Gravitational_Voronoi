@@ -5,7 +5,7 @@ import config from './config';
 import pako from 'pako';
 
 function subscribeToSocketIO(cb) {
-  const socket = openSocket('http://localhost:8000');
+  const socket = openSocket('http://localhost:10000');
   socket.on('to_client', data => cb(JSON.parse(pako.inflate(data, { to: 'string' }))));
 }
 

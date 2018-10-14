@@ -37,11 +37,8 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    if (process.env.USE_SOCKETIO) {
-      subscribeToSocketIO((data) => this.parseData(data));
-    } else {
-      subscribeToFirebase((data) => this.parseData(data));
-    }
+    subscribeToFirebase((data) => this.parseData(data));
+    // subscribeToSocketIO((data) => this.parseData(data));
   }
 
   parseData = (gameState) => {

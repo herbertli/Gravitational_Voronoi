@@ -90,7 +90,7 @@ python3 voronoi_client.py <server-ip> <port> <team-name>
 
 Finally, press `<Enter>` in the server terminal to start the game/round when prompted.
 
-## Running the game with display
+## Running the game with display via sockets
 
 First you must make sure you have `node.js` and `npm` installed. You also need relatively modern versions of both `node.js` and the browser you will be using for the display, though nothing bleeding edge is needed. But if you encounter any errors, you should always try upgrading your browser/`node.js` first.
 
@@ -131,6 +131,50 @@ python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> 
 
 Try not to refresh the page! At the moment, the board display will bug out.
 Every time you start a new server, the board will reset on your display.
+
+## Running the game with display via Firebase
+
+If you're going down this route, I'm assuming you semi-know what you are doing... 
+You should have (some?) experience in developing applications in firebase or at least be familiar with it.
+
+1. Initialize a firebase project and config your Realtime Database rules to allow for unauthenticated reads and writes
+2. Copy and paste your firebase credentials into a new file in web/src called config.js, it should look something like this:
+```
+const config = {
+    apiKey: "...",
+    authDomain: "...",
+    databaseURL: "...",
+    projectId: "...",
+    storageBucket: "...",
+    messagingSenderId: "..."
+};
+
+export default config;
+```
+
+3. Add a config.json file to the root folder containing the same credentials, it should look like this:
+```
+{
+    "apiKey": "...",
+    "authDomain": "...",
+    "databaseURL": "...",
+    "projectId": "...",
+    "storageBucket": "...",
+    "messagingSenderId": "..."
+}
+```
+
+4. You will need to install an additional pip package, pyrebase: `pip install pyrebase`
+5. change componentDidMount in web/src/App.jsx to use the firebase subscriber, and run the react app:
+```
+cd web/
+yarn start
+```
+
+Finally, run the game server:
+```
+python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> 2
+```
 
 ### Saving boards from display
 If you wish to save the boards (artworks) from the games you play, you can right click to save the image

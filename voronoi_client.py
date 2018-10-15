@@ -9,7 +9,8 @@ import json
 class Client:
 
     """
-    Perform steps 1-3 in constructor, as they are only done once anyways
+    Perform steps 1-3 of the client-server protocol in constructor, 
+    as they are only done once anyways
     """
     def __init__(self, host: str, port: int, name: str):
         self.host = host

@@ -16,7 +16,7 @@ The server is written in Python 3. To run the server execute:
 python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> [<use-graphics>]
 ```
 
-The last command line argument `<use-graphics>` is optional and graphics is only activated if you pass a `1` for this argument.
+The last command line argument `<use-graphics>` is optional. Socket based graphics is activated if you pass a `1` for this argument. Firebase based graphics is activated if you pass a `2` for this argument.
 
 Also note that ports `10000` and `8080` are reserved for the web interface and socket server, so please use some other port. After all clients have connected, press `<Enter>` to start the game.
 

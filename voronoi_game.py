@@ -61,7 +61,7 @@ class VoronoiGame:
             try:
                 import pyrebase
             except ImportError:
-                print("Please 'pip install pyrebase'.")
+                print("pyrebase isn't installed. Please 'pip install pyrebase' to display the graphics using Firebase.")
                 sys.exit(1)
             with open('config.json') as f:
                 config = json.load(f)

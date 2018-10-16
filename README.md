@@ -5,7 +5,7 @@ This repository contains the architect code for Gravitational Voronoi. It consis
 ## Dependencies
 
 1. Python 3.6+
-    1. pyrebase (pip install pyrebase)
+    1. pyrebase for firebase version (`pip install pyrebase`)
 2. Node.js / yarn (if you want to display games on browser)
 
 ## The server

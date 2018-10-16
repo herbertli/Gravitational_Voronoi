@@ -2,9 +2,15 @@
 
 This repository contains the architect code for Gravitational Voronoi. It consists of a game server, a sample client, and a web visualization interface that displays the game progress in real time.
 
+## Dependencies
+
+1. Python 3.6+
+    1. pyrebase (pip install pyrebase)
+2. Node.js / yarn (if you want to display games on browser)
+
 ## The server
 
-The server is written in Python 3. To run the server, execute:
+The server is written in Python 3. To run the server execute:
 
 ```
 python3 voronoi_game.py <number-of-stones> <number-of-players> <host-ip> <port> [<use-graphics>]
@@ -74,7 +80,7 @@ Player_number is your id that is assigned to you by the server.
 
 6. When the game over flag is true, every client receives a game update message saying the current round has ended. *You do not need to complete steps `1-3` again!* Instead, client should reset itself and treat all future updates as updates for a new game. Note that if your client is going first, you will receive a game update message from the server in which the moves array is empty. After you receive such message, send your move to the server. It might be helpful to take a look at how the sample client handles rotation if you are still confused.
 
-## Running the game without display
+## Running the game without display (recommended for local testing)
 
 To run the game without the display, run the game server with:
 

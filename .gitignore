@@ -359,6 +359,5 @@ GitHub.sublime-settings
 
 ### built files
 build/
-config.json
 
 # End of https://www.gitignore.io/api/node,linux,macos,python,intellij,sublimetext,visualstudiocode

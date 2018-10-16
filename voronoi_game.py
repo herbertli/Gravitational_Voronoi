@@ -6,7 +6,6 @@ import math
 import socket
 import json
 import zlib
-import pyrebase
 
 class VoronoiGame:
     def __init__(self, num_stones: int, num_players: int, grid_size: int, min_dist: int, host: str, port: int, use_graphic: bool, use_firebase: bool):
@@ -59,6 +58,11 @@ class VoronoiGame:
         # if using firebase, open a connection to the realtime-database
         self.use_firebase = use_firebase
         if use_firebase:
+            try:
+                import pyrebase
+            except ImportError:
+                print("pyrebase isn't installed. Please 'pip install pyrebase' to display the graphics using Firebase.")
+                sys.exit(1)
             with open('config.json') as f:
                 config = json.load(f)
                 firebase = pyrebase.initialize_app(config)
@@ -207,8 +211,8 @@ class VoronoiGame:
             move_row = self.moves[move_start][0]
             move_col = self.moves[move_start][1]
             if (self.__compute_distance(row, col, move_row, move_col) < self.min_dist):
-                print("({}, {}) is less than 66 unit distances away from ({}, {})".format(
-                    row, col, move_row, move_col))
+                print("({}, {}) is less than {} unit distances away from ({}, {})".format(
+                    row, col, self.min_dist, move_row, move_col))
                 return False
         return True
 

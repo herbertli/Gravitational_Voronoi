@@ -6,9 +6,10 @@ function subscribeToSocketIO(cb) {
 }
 
 function subscribeToFirebase(cb) {
-  const config = require('./config');
+  const config = require('./config').default;
   const firebase = require('firebase/app');
   firebase.initializeApp(config);
+  require("firebase/database");
   const ref = firebase.database().ref('gameState');
   let initialLoad = true;
   ref.on('value', (snapshot) => {

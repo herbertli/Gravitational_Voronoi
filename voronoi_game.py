@@ -17,27 +17,27 @@ class VoronoiGame:
         self.grid_size = grid_size
         self.grid = [[0] * grid_size for i in range(grid_size)]
         self.score_grid = [[0] * grid_size for i in range(grid_size)]
-        
+
         # minimum distance allowed between stoens
-        self.min_dist = min_dist  
-        
+        self.min_dist = min_dist
+
         # player scores and times and # moves/turns they have had (including invalid)
         self.scores = [0] * num_players
         self.player_times = [120.0] * num_players
         self.moves_made = [0] * num_players
-        
+
         # store moves played
         # each move corresponds is a list of 3 numbers
         self.moves = []
-        
+
         # gravitational pull, pull[i] is 2d-array of the pull player i has in total
         self.pull = []
         for i in range(num_players):
             self.pull.append([[0] * grid_size for j in range(grid_size)])
-        
+
         # first player to connect goes first
         self.current_player = 0
-        
+
         # flag
         self.game_over = False
 
@@ -54,7 +54,7 @@ class VoronoiGame:
             self.graphic_socket = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM)
             self.graphic_socket.connect(('localhost', 8080))
-        
+
         # if using firebase, open a connection to the realtime-database
         self.use_firebase = use_firebase
         if use_firebase:
@@ -85,13 +85,13 @@ class VoronoiGame:
     # create an object representing the state of the game, send to client
     def __get_game_state(self):
         game_info = {}
-        
+
         # game over flag
         game_info["game_over"] = self.game_over
-        
+
         # scores
         game_info["scores"] = self.scores
-        
+
         # new moves - go through move history in reverse order and stop when a move by current player is found
         # this gets the "new moves" for the current player
         # note that self.moves[i][2] stores the 1-indexed id of the player who made that move
@@ -147,7 +147,7 @@ class VoronoiGame:
                 if i == 1000:
                     break
         return decompressed_bitmap
-    
+
     # send the game state to firebase
     def __send_update_to_fb(self, move_row=False, move_col=False, soft_reset=False):
         data = {}
@@ -187,7 +187,7 @@ class VoronoiGame:
     # sends a reset signal after a round ends
     def __soft_reset_node(self):
         self.__send_update_to_node(soft_reset=True)
-    
+
     def __soft_reset_fb(self):
         self.__send_update_to_fb(soft_reset=True)
 
@@ -320,12 +320,23 @@ class VoronoiGame:
             while True:
                 # current_player is 0-indexed
                 self.current_player = self.current_player % self.num_players
-                
+
+                # check to see how many players are left
+                # if no players are left, the game is over
+                playersLeft = 0
+                for i in range(self.num_players):
+                    if self.player_times[i] > 0:
+                        playersLeft += 1
+                    elif self.moves_made[i] != self.num_stones:
+                        playersLeft += 1
+                if playersLeft == 0:
+                    self.game_over = True
+
                 # if it's game_over, broadcast game over state to all players, re-loop
                 if self.game_over:
                     self.__broadcast_game_info()
                     break
-                
+
                 # current player has run out of time, still we increment their turns
                 if self.player_times[self.current_player] <= 0:
                     print("Player", self.current_player + 1, "has run out of time.")
@@ -333,14 +344,14 @@ class VoronoiGame:
                     self.current_player += 1
                     continue
 
-                # send game state to current_player, 
+                # send game state to current_player,
                 # indicating they're on the clock to make a move
                 self.__broadcast_game_info()
                 move_row, move_col = self.__get_player_move()
                 print("{} has placed their stone on: {}, {}".format(
                     self.server.names[self.current_player], move_row, move_col))
                 self.moves_made[self.current_player] += 1
-                
+
                 # check if legal or not
                 # in any case, increment current_player's move counter
                 # also, handle case where they took too long...
@@ -355,7 +366,7 @@ class VoronoiGame:
                     self.moves.append(
                         [move_row, move_col, self.current_player + 1])
                     self.__update_scores(move_row, move_col)
-                
+
                 # if I've made all my moves, the game is over for me!
                 if self.moves_made[self.current_player] == self.num_stones:
                     self.player_times[self.current_player] = 0
@@ -365,18 +376,6 @@ class VoronoiGame:
                     self.__send_update_to_node(move_row=move_row, move_col=move_col)
                 if self.use_firebase:
                     self.__send_update_to_fb(move_row=move_row, move_col=move_col)
-
-                # check for game over condition:
-                # all players have made all their moves or all players have run out of time
-                playersLeft = 0
-                for i in range(self.num_players):
-                    if self.player_times[i] > 0:
-                        playersLeft += 1
-                    elif self.moves_made[i] != self.num_stones:
-                        playersLeft += 1
-                # if there are no players remaining, game is over!
-                if playersLeft == 0:
-                    self.game_over = True
 
                 # go to next player
                 self.current_player += 1
@@ -413,7 +412,7 @@ if __name__ == "__main__":
     num_players = int(sys.argv[2])
     host = sys.argv[3]
     port = int(sys.argv[4])
-    
+
     use_graphic = False
     if len(sys.argv) == 6 and int(sys.argv[5]) == 1:
         use_graphic = True
